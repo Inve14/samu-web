@@ -86,7 +86,7 @@ punto d'ingresso del "Mio Lavoro").
 
 | File | Descrizione |
 |---|---|
-| `index.html` | Landing: hero col nome + 3 pannelli (Chi Sono / Il Mio Lavoro / Contattami) — foto reali su Chi Sono e Il Mio Lavoro, Contattami statico |
+| `index.html` | Landing: hero col nome + 3 pannelli (Chi Sono / Il Mio Lavoro / Contattami) — foto reali su tutti e tre; Contattami è `panel--static`, quindi una sola foto senza crossfade |
 | `chi-sono.html` | Pagina statica bio: ritratto reale (`assets/foto/chi-sono/profilo.jpg`) a sinistra, testo a destra |
 | `lavoro.html` | Hub, 3 pannelli: Foto (foto reali) / Streaming (placeholder) / Video (placeholder) |
 | `foto.html` | 4 pannelli, tutti con foto reali: Programmi TV / Celebrazioni / Eventi / Sport |

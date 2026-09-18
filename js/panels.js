@@ -59,9 +59,9 @@ function initVerticalPanels(options = {}) {
     // Pannelli statici (es. Contattami): un solo placeholder, nessun crossfade.
     const isStatic = panel.classList.contains('panel--static');
 
-    // TODO: sostituire con foto reali — quando arriveranno le immagini,
-    // aggiungere al pannello l'attributo data-images="percorso1.jpg,percorso2.jpg,..."
-    // e le slide useranno le foto al posto dei placeholder.
+    // Foto reali: l'attributo data-images="percorso1.jpg,percorso2.jpg,..."
+    // sul pannello sostituisce i placeholder generati. Su un pannello statico
+    // viene usata solo la prima. Senza l'attributo restano i placeholder grigi.
     const images = (panel.dataset.images || '')
       .split(',')
       .map((s) => s.trim())
