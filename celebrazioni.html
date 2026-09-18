@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Celebrazioni — Samuele Casabianca</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;600&family=Caveat:wght@600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <header class="site-nav">
+    <a class="logo-sc" href="index.html" aria-label="Torna alla home"><img src="assets/logo-sc.png" alt="Samuele Casabianca — logo"></a>
+    <nav class="breadcrumb" aria-label="Percorso">
+      <a href="lavoro.html">Lavoro</a>
+      <span class="sep">/</span>
+      <a href="foto.html">Foto</a>
+      <span class="sep">/</span>
+      <span aria-current="page">Celebrazioni</span>
+    </nav>
+    <div class="nav-right">
+      <a class="nav-contact" href="contattami.html">Contattami</a>
+      <button class="nav-burger" aria-label="Apri il menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Pannelli verticali: sotto-categorie di Celebrazioni -->
+  <main class="panels">
+    <a class="panel" href="celebrazioni-matrimoni.html" data-images="assets/foto/celebrazioni-matrimonio/_E7A2228.jpg,assets/foto/celebrazioni-matrimonio/12529.jpg,assets/foto/celebrazioni-matrimonio/12926.jpg,assets/foto/celebrazioni-matrimonio/13453.jpg,assets/foto/celebrazioni-matrimonio/13953.jpg">
+      <span class="panel-title">Matrimoni</span>
+    </a>
+    <a class="panel" href="celebrazioni-feste-private.html" data-images="assets/foto/celebrazioni-feste/1_104.jpg,assets/foto/celebrazioni-feste/1_170.jpg,assets/foto/celebrazioni-feste/1_231.jpg,assets/foto/celebrazioni-feste/1_290.jpg,assets/foto/celebrazioni-feste/1_311.jpg">
+      <span class="panel-title">Feste Private</span>
+    </a>
+  </main>
+
+  <script src="js/panels.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    initVerticalPanels();
+  </script>
+</body>
+</html>

@@ -1,0 +1,1415 @@
+/* ==========================================================================
+   Portfolio Samuele Casabianca — style.css
+   Solo CSS vanilla. Variabili di tema in :root per personalizzazione futura.
+   ========================================================================== */
+
+/* ---------- Variabili di tema ---------- */
+:root {
+  /* Colori */
+  --color-bg: #0e0e10;            /* sfondo principale (quasi nero) */
+  --color-surface: #17171b;       /* superfici / card */
+  --color-placeholder: #232328;   /* sfondo box placeholder foto */
+  --color-border-dash: #4a4a52;   /* bordo tratteggiato placeholder */
+  --color-text: #f2f2f0;
+  --color-text-muted: #9a9aa2;
+  --color-accent: #c9a26b;        /* accento caldo per hover/dettagli */
+  --color-overlay: rgba(10, 10, 12, 0.55);        /* overlay scuro pannelli */
+  --color-overlay-light: rgba(10, 10, 12, 0.25);  /* overlay pannello in hover */
+
+  /* Font */
+  --font-display: 'Anton', sans-serif;      /* titoli strutturali */
+  --font-script: 'Caveat', cursive;         /* "Samuele" in corsivo */
+  --font-body: 'Archivo', sans-serif;       /* testo corrente */
+
+  /* Spaziature */
+  --space-xs: 0.5rem;
+  --space-sm: 1rem;
+  --space-md: 2rem;
+  --space-lg: 4rem;
+
+  /* Varie */
+  --nav-height: 64px;
+  --transition-fast: 0.3s ease;
+  --transition-slow: 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  --radius: 4px;
+}
+
+/* ---------- Reset minimo ---------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+/* ---------- Utility ---------- */
+.u-hidden {
+  display: none !important;
+}
+
+/* Box placeholder foto generico (usato anche da gallerie e ritratti).
+   Quando arriveranno le foto reali basta sostituire il div .ph con un <img>. */
+.ph {
+  background: var(--color-placeholder);
+  border: 1px dashed var(--color-border-dash);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-muted);
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  user-select: none;
+}
+
+/* ==========================================================================
+   Barra di navigazione fissa
+   ========================================================================== */
+.site-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--nav-height);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  padding: 0 var(--space-md);
+  z-index: 100;
+  background: linear-gradient(to bottom, rgba(10, 10, 12, 0.85), rgba(10, 10, 12, 0));
+}
+
+/* Su pagine con contenuto scrollabile la nav ha uno sfondo pieno */
+.site-nav--solid {
+  background: rgba(14, 14, 16, 0.92);
+  border-bottom: 1px solid #26262c;
+  backdrop-filter: blur(6px);
+}
+
+/* Logo reale (immagine ritagliata in assets/logo-sc.png): la cornice ad
+   angoli aperti che prima disegnavamo via ::before/::after è già disegnata
+   nel file, quindi qui serve solo dimensionare l'<img> e dare un feedback
+   hover leggero (l'immagine non può cambiare colore come faceva il testo). */
+.logo-sc {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.3rem 0.5rem;
+  transition: opacity var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.logo-sc img {
+  display: block;
+  height: 46px;
+  width: auto;
+  max-width: 64px;
+  max-height: 46px;
+  object-fit: contain;
+}
+
+.logo-sc:hover {
+  opacity: 0.8;
+}
+
+/* Breadcrumb testuale */
+.breadcrumb {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.breadcrumb a {
+  color: var(--color-text-muted);
+  transition: color var(--transition-fast);
+}
+
+.breadcrumb a:hover {
+  color: var(--color-text);
+}
+
+.breadcrumb span[aria-current] {
+  color: var(--color-text);
+}
+
+.breadcrumb .sep {
+  color: #55555e;
+}
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.nav-contact {
+  font-size: 0.8rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding-bottom: 2px;
+  border-bottom: 1px solid transparent;
+  transition: border-color var(--transition-fast), color var(--transition-fast);
+}
+
+.nav-contact:hover {
+  color: var(--color-accent);
+  border-bottom-color: var(--color-accent);
+}
+
+/* Hamburger (menu mobile) */
+.nav-burger {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 40px;
+  height: 40px;
+  padding: 8px;
+  z-index: 210;
+}
+
+.nav-burger span {
+  display: block;
+  height: 2px;
+  width: 100%;
+  background: var(--color-text);
+  transition: transform var(--transition-fast), opacity var(--transition-fast);
+}
+
+/* Burger -> X quando il menu è aperto */
+.nav-burger.is-open span:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+
+.nav-burger.is-open span:nth-child(2) {
+  opacity: 0;
+}
+
+.nav-burger.is-open span:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+/* Overlay menu a schermo intero (iniettato da main.js) */
+.mobile-menu {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(12, 12, 14, 0.97);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity var(--transition-fast), visibility var(--transition-fast);
+}
+
+.mobile-menu.is-open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.mobile-menu a {
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 4vw, 2rem);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text);
+  transition: color var(--transition-fast);
+}
+
+.mobile-menu a:hover {
+  color: var(--color-accent);
+}
+
+.mobile-menu a.menu-sub {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  color: var(--color-text-muted);
+  letter-spacing: 0.2em;
+}
+
+.mobile-menu a.menu-sub:hover {
+  color: var(--color-accent);
+}
+
+/* Terzo livello (es. le categorie foto dentro Foto): stesso stile, più discreto */
+.mobile-menu a.menu-sub2 {
+  font-size: 0.8rem;
+  opacity: 0.75;
+}
+
+/* ==========================================================================
+   Componente "pannelli verticali" (vedi js/panels.js)
+   ========================================================================== */
+.panels {
+  display: flex;
+  height: 100vh;
+  height: 100dvh; /* mobile: evita salti con la barra del browser */
+  overflow: hidden;
+}
+
+.panel {
+  position: relative;
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  transition: flex-grow var(--transition-slow);
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.panel:last-child {
+  border-right: none;
+}
+
+.panel:hover,
+.panel:focus-visible {
+  flex-grow: 1.6;
+  outline: none;
+}
+
+/* Slide di sfondo (iniettate da panels.js): da ferme si vede solo la prima,
+   statica (nessuna transizione). Il crossfade parte/si ferma esclusivamente
+   quando panels.js crea/distrugge il suo setInterval (in risposta a
+   mouseenter/mouseleave/focus/blur sul pannello) alternando la classe
+   `.is-active` — niente `:hover`/`:focus-visible` diretto qui: quei
+   pseudo-stati possono restare "veri" più a lungo di quanto sembri (es. un
+   pannello che rimane focused dopo un click, o lo stato del DOM ripristinato
+   dalla bfcache), facendo ripartire il cambio slide senza che il cursore sia
+   davvero sopra. */
+.panel-slides {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.panel-slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.7s ease-in-out;
+  background-size: cover;
+  background-position: center;
+}
+
+/* Le foto di "Chi Sono" sono ritratti verticali: con "cover" centrato il
+   pannello (molto più largo che alto quando si espande in hover) tagliava
+   via il viso e mostrava solo il busto. Ancoriamo l'inquadratura in alto
+   così il volto resta sempre visibile. */
+.panel[href="chi-sono.html"] .panel-slide {
+  background-position: center top;
+}
+
+.panel-slide.is-active {
+  opacity: 1;
+}
+
+/* Variante placeholder della slide: bordo tratteggiato + etichetta "Foto N".
+   L'etichetta sta in basso per non sovrapporsi al titolo del pannello. */
+.panel-slide.ph {
+  border: none;
+  outline: 1px dashed var(--color-border-dash);
+  outline-offset: -14px;
+  align-items: flex-end;
+  padding-bottom: 2.2rem;
+}
+
+/* Overlay scuro sopra le slide, si alleggerisce in hover */
+.panel::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: var(--color-overlay);
+  transition: background var(--transition-slow);
+}
+
+.panel:hover::after,
+.panel:focus-visible::after {
+  background: var(--color-overlay-light);
+}
+
+/* Titolo della sezione: sempre visibile, centrato, maiuscolo */
+.panel-title {
+  position: relative;
+  z-index: 2;
+  font-family: var(--font-display);
+  font-size: clamp(1.2rem, 2.2vw, 2rem);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-align: center;
+  padding: 0 var(--space-sm);
+  transition: transform var(--transition-slow), letter-spacing var(--transition-slow);
+  text-shadow: 0 2px 20px rgba(0, 0, 0, 0.8);
+}
+
+.panel:hover .panel-title,
+.panel:focus-visible .panel-title {
+  transform: scale(1.18);
+  letter-spacing: 0.16em;
+}
+
+/* Sottolineatura decorativa che appare in hover */
+.panel-title::after {
+  content: '';
+  display: block;
+  width: 0;
+  height: 2px;
+  margin: 0.6rem auto 0;
+  background: var(--color-accent);
+  transition: width var(--transition-slow);
+}
+
+.panel:hover .panel-title::after,
+.panel:focus-visible .panel-title::after {
+  width: 60%;
+}
+
+/* Etichetta "sezione in costruzione" sotto il titolo del pannello (es. Streaming) */
+.panel-note {
+  position: relative;
+  z-index: 2;
+  display: block;
+  margin-top: 0.5rem;
+  font-family: var(--font-body);
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  text-align: center;
+  color: var(--color-accent);
+}
+
+/* ---------- Hero overlay sulla landing (index.html) ---------- */
+.hero-name {
+  position: absolute;
+  top: clamp(4.5rem, 12vh, 8rem);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  text-align: center;
+  pointer-events: none; /* i click passano ai pannelli sottostanti */
+  width: 100%;
+  padding: 0 var(--space-sm);
+}
+
+.hero-name .script {
+  font-family: var(--font-script);
+  font-size: clamp(3rem, 8vw, 5.5rem);
+  font-weight: 600;
+  line-height: 1;
+  color: var(--color-text);
+  text-shadow: 0 2px 30px rgba(0, 0, 0, 0.9);
+}
+
+.hero-name .surname {
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 4.5vw, 3rem);
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  line-height: 1.2;
+  text-shadow: 0 2px 30px rgba(0, 0, 0, 0.9);
+}
+
+.hero-name .tagline {
+  margin-top: var(--space-xs);
+  font-size: clamp(0.7rem, 1.6vw, 0.9rem);
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.9);
+}
+
+/* ==========================================================================
+   Galleria masonry + lightbox
+   ========================================================================== */
+.page-content {
+  padding: calc(var(--nav-height) + var(--space-md)) var(--space-md) var(--space-lg);
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.page-heading {
+  margin-bottom: var(--space-md);
+}
+
+.page-heading h1 {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  line-height: 1.1;
+}
+
+.page-heading p {
+  margin-top: var(--space-xs);
+  color: var(--color-text-muted);
+  max-width: 60ch;
+}
+
+/* Masonry con CSS columns: semplice e senza JS */
+.masonry {
+  columns: 3;
+  column-gap: var(--space-sm);
+}
+
+.masonry-item {
+  break-inside: avoid;
+  margin-bottom: var(--space-sm);
+  cursor: pointer;
+  overflow: hidden;
+  border-radius: var(--radius);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.masonry-item:hover {
+  transform: scale(1.03);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+}
+
+/* Proporzioni varie per simulare il ritmo masonry finché non ci sono foto */
+.masonry-item .ph {
+  width: 100%;
+}
+
+.ph--tall {
+  aspect-ratio: 3 / 4;
+}
+
+.ph--wide {
+  aspect-ratio: 16 / 10;
+}
+
+.ph--square {
+  aspect-ratio: 1 / 1;
+}
+
+.ph--panorama {
+  aspect-ratio: 21 / 10;
+}
+
+/* ---------- Lightbox ---------- */
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  background: rgba(8, 8, 10, 0.94);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity var(--transition-fast), visibility var(--transition-fast);
+}
+
+.lightbox.is-open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.lightbox-content {
+  width: min(80vw, 1000px);
+  height: min(75vh, 700px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lightbox-content .ph {
+  width: 100%;
+  height: 100%;
+  font-size: 1rem;
+}
+
+.lightbox-caption {
+  position: absolute;
+  bottom: 5vh;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.8rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.lightbox-close,
+.lightbox-prev,
+.lightbox-next {
+  position: absolute;
+  font-size: 2rem;
+  line-height: 1;
+  color: var(--color-text-muted);
+  padding: var(--space-sm);
+  transition: color var(--transition-fast), transform var(--transition-fast);
+  z-index: 2;
+}
+
+.lightbox-close:hover,
+.lightbox-prev:hover,
+.lightbox-next:hover {
+  color: var(--color-text);
+  transform: scale(1.15);
+}
+
+.lightbox-close {
+  top: var(--space-sm);
+  right: var(--space-sm);
+}
+
+.lightbox-prev {
+  left: var(--space-sm);
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.lightbox-next {
+  right: var(--space-sm);
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.lightbox-prev:hover,
+.lightbox-next:hover {
+  transform: translateY(-50%) scale(1.15);
+}
+
+/* ==========================================================================
+   Sezioni Streaming e Video (stile piattaforma video)
+   ========================================================================== */
+
+/* Chip di filtro (solo video.html) */
+.filter-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-bottom: var(--space-md);
+}
+
+.chip {
+  padding: 0.5rem 1.2rem;
+  border: 1px solid #2c2c33;
+  border-radius: 999px;
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  transition: color var(--transition-fast), border-color var(--transition-fast),
+    background var(--transition-fast);
+}
+
+.chip:hover {
+  color: var(--color-text);
+}
+
+.chip.is-active {
+  color: var(--color-bg);
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+/* Griglia di card (streaming.html, video.html) */
+.video-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: var(--space-md);
+}
+
+.video-card {
+  display: block;
+  transition: opacity var(--transition-fast);
+}
+
+.video-card.is-filtered-out {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.video-thumb {
+  aspect-ratio: 16 / 9;
+  width: 100%;
+  background: var(--color-placeholder);
+  border: 1px dashed var(--color-border-dash);
+  border-radius: var(--radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-muted);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  overflow: hidden;
+  transition: transform var(--transition-fast);
+}
+
+.video-card:hover .video-thumb {
+  transform: scale(1.02);
+}
+
+/* Miniatura con fotogramma reale: via il riquadro tratteggiato del segnaposto.
+   I video orizzontali riempiono la card (cover), quelli verticali (9:16)
+   restano interi dentro la card 16:9 (contain su fondo nero) invece di
+   essere ritagliati fino a mostrare solo una striscia centrale. */
+.video-thumb--real,
+.watch-related-thumb--real {
+  background: #000;
+  border-style: solid;
+  border-color: #2c2c33;
+  overflow: hidden;
+}
+
+.video-thumb--real img,
+.watch-related-thumb--real img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.video-thumb--real.is-vertical img,
+.watch-related-thumb--real.is-vertical img {
+  object-fit: contain;
+}
+
+.video-info {
+  padding-top: 0.6rem;
+}
+
+.video-title {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.95rem;
+  line-height: 1.3;
+}
+
+.video-meta {
+  margin-top: 0.2rem;
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}
+
+/* Pagina di riproduzione (streaming-watch.html, video-watch.html) */
+.watch-layout {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: var(--space-lg);
+  align-items: start;
+}
+
+.watch-player {
+  aspect-ratio: 16 / 9;
+  width: 100%;
+  background: var(--color-placeholder);
+  border: 1px dashed var(--color-border-dash);
+  border-radius: var(--radius);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+
+/* Player con video reale: fondo nero e nessun bordo tratteggiato. Per i video
+   verticali il riquadro passa a 9:16 e viene centrato, con un tetto in vh che
+   evita che superi l'altezza della finestra. */
+.watch-player--real {
+  display: block;
+  background: #000;
+  border: 1px solid #2c2c33;
+  cursor: default;
+  overflow: hidden;
+}
+
+.watch-player--real.is-vertical {
+  aspect-ratio: 9 / 16;
+  max-width: min(100%, 46vh);
+  margin-inline: auto;
+}
+
+.watch-player--real video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.watch-player-icon {
+  font-size: 3rem;
+}
+
+.watch-player-label {
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.watch-title {
+  margin-top: var(--space-md);
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 3vw, 2rem);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  line-height: 1.2;
+}
+
+.watch-meta {
+  margin-top: 0.4rem;
+  font-size: 0.85rem;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted);
+}
+
+.watch-description {
+  margin-top: var(--space-sm);
+  color: #cfcfd4;
+  max-width: 65ch;
+}
+
+.watch-related-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.watch-related-item {
+  display: flex;
+  gap: 0.8rem;
+}
+
+.watch-related-thumb {
+  flex: 0 0 120px;
+  aspect-ratio: 16 / 9;
+  background: var(--color-placeholder);
+  border: 1px dashed var(--color-border-dash);
+  border-radius: var(--radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-muted);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+}
+
+.watch-related-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+}
+
+.watch-related-title {
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.watch-related-meta {
+  margin-top: 0.2rem;
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+@media (max-width: 900px) {
+  .watch-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ==========================================================================
+   Pagina Chi Sono
+   ========================================================================== */
+.about {
+  display: grid;
+  grid-template-columns: minmax(280px, 420px) 1fr;
+  gap: var(--space-lg);
+  align-items: start;
+}
+
+.about-portrait .ph,
+.about-portrait img {
+  aspect-ratio: 3 / 4;
+  width: 100%;
+  border-radius: var(--radius);
+}
+
+.about-portrait img {
+  object-fit: cover;
+}
+
+.about-text h1 {
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  line-height: 1.15;
+  margin-bottom: var(--space-sm);
+}
+
+.about-text h1 .script {
+  display: block;
+  font-family: var(--font-script);
+  font-size: clamp(2.4rem, 5vw, 3.4rem);
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--color-accent);
+}
+
+.about-text p {
+  margin-bottom: var(--space-sm);
+  color: #cfcfd4;
+  max-width: 65ch;
+}
+
+/* Bottone generico */
+.btn {
+  display: inline-block;
+  margin-top: var(--space-sm);
+  padding: 0.8rem 2rem;
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  border: 1px solid var(--color-text);
+  border-radius: var(--radius);
+  transition: background var(--transition-fast), color var(--transition-fast),
+    border-color var(--transition-fast);
+}
+
+.btn:hover {
+  background: var(--color-text);
+  color: var(--color-bg);
+}
+
+.btn--accent {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.btn--accent:hover {
+  background: var(--color-accent);
+  color: var(--color-bg);
+}
+
+/* ==========================================================================
+   Pagina Contattami
+   ========================================================================== */
+.contact-wrap {
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  margin-top: var(--space-md);
+}
+
+.contact-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.contact-form input,
+.contact-form textarea {
+  background: var(--color-surface);
+  border: 1px solid #2c2c33;
+  border-radius: var(--radius);
+  padding: 0.9rem 1rem;
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  transition: border-color var(--transition-fast);
+}
+
+.contact-form input:focus,
+.contact-form textarea:focus {
+  outline: none;
+  border-color: var(--color-accent);
+}
+
+.contact-form textarea {
+  min-height: 160px;
+  resize: vertical;
+}
+
+.contact-links {
+  margin-top: var(--space-lg);
+  padding-top: var(--space-md);
+  border-top: 1px solid #26262c;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+}
+
+.contact-links a {
+  color: var(--color-text);
+  border-bottom: 1px solid transparent;
+  transition: color var(--transition-fast), border-color var(--transition-fast);
+}
+
+.contact-links a:hover {
+  color: var(--color-accent);
+  border-bottom-color: var(--color-accent);
+}
+
+/* ==========================================================================
+   Footer
+   ========================================================================== */
+.site-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-md);
+  border-top: 1px solid #1f1f24;
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* === Transizioni pannelli =================================================
+   Transizione animata tra le pagine a pannelli (vedi js/panels.js):
+   - USCITA: .panel-expander è un clone fixed del pannello cliccato che si
+     espande a tutto schermo (.is-full) mentre il resto sfuma (.is-leaving).
+   - INGRESSO: i pannelli partono chiusi (.panel--closed, scale 0) dietro la
+     cover .panels-cover e si aprono in sequenza (split orizzontale su
+     desktop, verticale su mobile).
+   Con prefers-reduced-motion il JS non attiva nulla di tutto questo. */
+
+/* -- Uscita: clone del pannello che si espande -- */
+.panel-expander {
+  position: fixed;
+  z-index: 150; /* sopra nav (100) e hero (10), sotto menu mobile (200) */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background-color: var(--color-placeholder);
+  background-size: cover;
+  background-position: center;
+  transition:
+    top 0.55s cubic-bezier(0.65, 0, 0.35, 1),
+    left 0.55s cubic-bezier(0.65, 0, 0.35, 1),
+    width 0.55s cubic-bezier(0.65, 0, 0.35, 1),
+    height 0.55s cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+/* Stessa velatura scura dei pannelli, per continuità visiva */
+.panel-expander::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--color-overlay-light);
+}
+
+.panel-expander .panel-title {
+  position: relative;
+  z-index: 1;
+}
+
+/* Stato finale: tutto schermo (!important per vincere sugli stili inline
+   con cui il JS posiziona il clone sul rettangolo di partenza) */
+.panel-expander.is-full {
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  height: 100dvh !important;
+}
+
+/* Il resto della pagina sfuma mentre il clone cresce */
+.is-leaving .panel,
+.is-leaving .hero-name {
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+
+.panels--leaving .panel {
+  pointer-events: none;
+}
+
+/* -- Ingresso: cover + split dei pannelli -- */
+.panels-cover {
+  position: fixed;
+  inset: 0;
+  background: var(--color-bg);
+  pointer-events: none;
+  transition: opacity 0.35s ease;
+}
+
+.panels--entering .panel {
+  transform: scaleX(1);
+  transform-origin: left center;
+  transition: transform 0.5s cubic-bezier(0.65, 0, 0.35, 1);
+  pointer-events: none;
+}
+
+.panels--entering .panel.panel--closed {
+  transform: scaleX(0);
+  transition: none;
+}
+
+/* Su mobile i pannelli sono impilati: lo split diventa verticale */
+@media (max-width: 768px) {
+  .panels--entering .panel {
+    transform: scaleY(1);
+    transform-origin: center top;
+  }
+
+  .panels--entering .panel.panel--closed {
+    transform: scaleY(0);
+  }
+}
+
+/* === Splash screen ========================================================
+   Schermata di benvenuto della home (solo index.html, vedi js/splash.js):
+   overlay a schermo pieno col monogramma centrato, fade-out via .is-hidden. */
+.splash {
+  position: fixed;
+  inset: 0;
+  z-index: 400; /* sopra menu mobile (200) e lightbox (300) */
+  background: var(--color-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 1;
+  transition: opacity 0.7s ease;
+}
+
+.splash.is-hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Palco centrale dello splash: quadrato con angoli smussati che racchiude il
+   logo. Dimensione fissa (non fluida) perché i keyframe dei due punti di luce
+   sono in percentuale relativa a questo box: cambia solo via media query, non
+   con clamp/vw, altrimenti i due sistemi (punti + riquadro) potrebbero
+   disallinearsi durante un resize a metà animazione. */
+.splash-stage {
+  position: relative;
+  width: 168px;
+  height: 168px;
+}
+
+@media (max-width: 768px) {
+  .splash-stage {
+    width: 128px;
+    height: 128px;
+  }
+}
+
+/* Il riquadro vero e proprio: sfondo/bordo leggermente più chiari dello
+   sfondo dello splash (altrimenti, essendo entrambi scuri, il "ritaglio"
+   luminoso del contorno non si vedrebbe). Parte completamente mascherato
+   (clip-path chiuso, non semplice opacity: 0) e viene "rivelato" dall'alto
+   verso il basso in sincrono col percorso dei due punti (stessa durata). */
+.splash-frame {
+  --splash-frame-radius: 18px;
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+  background: var(--color-surface);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--splash-frame-radius);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  clip-path: inset(0 0 100% 0 round var(--splash-frame-radius));
+  animation: splash-frame-reveal 1.2s cubic-bezier(0.4, 0, 0.2, 1) both;
+  transition: background-color 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+}
+
+/* Applicata da js/splash.js un istante prima del "volo" verso la nav: il
+   riquadro perde il proprio sfondo/bordo mentre il logo (vedi .logo-fly)
+   si muove al suo posto, così alla fine resta solo il logo, senza cornice,
+   coerente con l'aspetto "nudo" del logo nella nav. */
+.splash-frame.is-dismissing {
+  background-color: transparent;
+  border-color: transparent;
+  box-shadow: none;
+}
+
+@media (max-width: 768px) {
+  .splash-frame {
+    padding: 14px;
+  }
+}
+
+.splash-frame-logo {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+@keyframes splash-frame-reveal {
+  from {
+    clip-path: inset(0 0 100% 0 round var(--splash-frame-radius));
+  }
+  to {
+    clip-path: inset(0 0 0% 0 round var(--splash-frame-radius));
+  }
+}
+
+/* Punti luminosi che "ritagliano" il quadrato fuori dal buio: partono
+   insieme dal centro del lato superiore e percorrono il perimetro in
+   direzioni opposte (orario/antiorario), incontrandosi al centro del lato
+   inferiore. Le coordinate sono in percentuale (relative a .splash-stage),
+   così restano corrette a qualunque dimensione del box, incluso dopo un
+   resize della finestra. */
+.splash-dot {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 10px;
+  height: 10px;
+  margin: -5px;
+  border-radius: 50%;
+  background: var(--color-text);
+  box-shadow: 0 0 12px 4px rgba(242, 242, 240, 0.85);
+  opacity: 0;
+}
+
+.splash-dot--cw {
+  animation: splash-dot-cw 1.2s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+.splash-dot--ccw {
+  animation: splash-dot-ccw 1.2s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+@keyframes splash-dot-cw {
+  0% {
+    left: 50%;
+    top: 0%;
+    opacity: 1;
+  }
+  25% {
+    left: 100%;
+    top: 0%;
+  }
+  75% {
+    left: 100%;
+    top: 100%;
+  }
+  95% {
+    opacity: 1;
+  }
+  100% {
+    left: 50%;
+    top: 100%;
+    opacity: 0;
+  }
+}
+
+@keyframes splash-dot-ccw {
+  0% {
+    left: 50%;
+    top: 0%;
+    opacity: 1;
+  }
+  25% {
+    left: 0%;
+    top: 0%;
+  }
+  75% {
+    left: 0%;
+    top: 100%;
+  }
+  95% {
+    opacity: 1;
+  }
+  100% {
+    left: 50%;
+    top: 100%;
+    opacity: 0;
+  }
+}
+
+/* Logo "in volo" verso la nav (clone creato da js/splash.js): posizionato
+   sul rettangolo esatto del logo dello splash, poi animato con
+   transform: translate() + scale() — mai top/left/width/height diretti,
+   per restare sul compositor e non innescare reflow durante l'animazione. */
+.logo-fly {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 410; /* sopra la splash (400) */
+  display: block;
+  object-fit: contain;
+  pointer-events: none;
+  transform-origin: top left;
+  transition: transform 0.8s cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+/* ==========================================================================
+   Responsive
+   ========================================================================== */
+@media (max-width: 900px) {
+  .masonry {
+    columns: 2;
+  }
+}
+
+@media (max-width: 768px) {
+  .site-nav {
+    padding: 0 var(--space-sm);
+  }
+
+  .breadcrumb {
+    font-size: 0.7rem;
+  }
+
+  .nav-contact {
+    display: none; /* su mobile il link Contattami vive nel menu overlay */
+  }
+
+  /* Pannelli impilati verticalmente, niente hover-expand */
+  .panels {
+    flex-direction: column;
+    height: auto;
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+
+  .panel {
+    flex: none;
+    min-height: 30vh;
+    border-right: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .panel:hover,
+  .panel:focus-visible {
+    flex-grow: 0;
+  }
+
+  .panel:hover .panel-title {
+    transform: none;
+    letter-spacing: 0.1em;
+  }
+
+  /* Landing: il primo blocco lascia spazio al nome */
+  .panels--landing .panel:first-child {
+    padding-top: 20vh;
+    min-height: 46vh;
+  }
+
+  .hero-name {
+    top: clamp(3.5rem, 8vh, 6rem);
+  }
+
+  .hero-name .tagline {
+    letter-spacing: 0.18em;
+  }
+
+  .page-content {
+    padding: calc(var(--nav-height) + var(--space-sm)) var(--space-sm) var(--space-md);
+  }
+
+  .about {
+    grid-template-columns: 1fr;
+    gap: var(--space-md);
+  }
+
+  .about-portrait {
+    max-width: 320px;
+  }
+}
+
+@media (max-width: 560px) {
+  .masonry {
+    columns: 1;
+  }
+}
+
+/* Desktop: hamburger visibile ma discreto (il menu overlay è utile ovunque) */
+@media (min-width: 769px) {
+  .nav-burger {
+    opacity: 0.7;
+  }
+
+  .nav-burger:hover {
+    opacity: 1;
+  }
+}
+
+/* Rispetto della preferenza utente per il movimento ridotto */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+
+  /* Niente ritaglio luminoso: il riquadro dello splash appare già completo
+     e fermo, i due punti restano nascosti del tutto (non solo "veloci"). */
+  .splash-frame {
+    animation: none;
+    clip-path: none;
+  }
+
+  .splash-dot {
+    display: none;
+  }
+}

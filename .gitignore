@@ -1,0 +1,25 @@
+# ---- File sorgente pesanti, non serviti dal sito ----
+# Originali a piena risoluzione ricevuti da Samuele (~1,7 GB):
+# il sito referenzia solo assets/, mai immagini/
+immagini/
+
+# ---- Video ----
+# I 22 MP4 (~2,2 GB) non stanno nel repo: sono su YouTube e il sito
+# li mostra via embed. Le miniature in assets/video/poster/ restano.
+*.mp4
+*.mov
+*.MP4
+*.MOV
+
+# ---- Scarti ----
+_to_delete/
+
+# ---- Sistema / editor ----
+.DS_Store
+.claude/
+node_modules/
+.vercel
+
+# Documenti personali finiti per sbaglio nella cartella
+*.pdf
+namecheap-order-*

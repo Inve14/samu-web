@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contattami — Samuele Casabianca</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;600&family=Caveat:wght@600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <header class="site-nav site-nav--solid">
+    <a class="logo-sc" href="index.html" aria-label="Torna alla home"><img src="assets/logo-sc.png" alt="Samuele Casabianca — logo"></a>
+    <nav class="breadcrumb" aria-label="Percorso">
+      <span aria-current="page">Contattami</span>
+    </nav>
+    <div class="nav-right">
+      <a class="nav-contact" href="contattami.html">Contattami</a>
+      <button class="nav-burger" aria-label="Apri il menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main class="page-content">
+    <div class="contact-wrap">
+      <div class="page-heading">
+        <h1>Contattami</h1>
+        <p>
+          Hai un progetto in mente? Un evento da raccontare? Scrivimi e ti
+          risponderò il prima possibile.
+        </p>
+      </div>
+
+      <!-- Il form compone un mailto: con i dati inseriti (nessun backend) -->
+      <form class="contact-form" novalidate>
+        <label for="nome">
+          Nome
+          <input type="text" id="nome" name="nome" required placeholder="Il tuo nome">
+        </label>
+        <label for="email">
+          Email
+          <input type="email" id="email" name="email" required placeholder="latuaemail@esempio.it">
+        </label>
+        <label for="messaggio">
+          Messaggio
+          <textarea id="messaggio" name="messaggio" required placeholder="Raccontami il tuo progetto..."></textarea>
+        </label>
+        <button type="submit" class="btn btn--accent">Invia</button>
+      </form>
+
+      <div class="contact-links">
+        <!-- TODO: sostituire con i contatti reali di Samuele -->
+        <span>Email: <a href="mailto:info@samuelecasabianca.it">info@samuelecasabianca.it</a></span>
+        <span>Instagram: <a href="#" target="_blank" rel="noopener">@samuelecasabianca</a></span>
+        <span>LinkedIn: <a href="#" target="_blank" rel="noopener">Samuele Casabianca</a></span>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <a class="logo-sc" href="index.html" aria-label="Torna alla home"><img src="assets/logo-sc.png" alt="Samuele Casabianca — logo"></a>
+    <span>Samuele Casabianca — Fotografo, Videomaker e Regista</span>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

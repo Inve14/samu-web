@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Streaming — Samuele Casabianca</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;600&family=Caveat:wght@600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <header class="site-nav site-nav--solid">
+    <a class="logo-sc" href="index.html" aria-label="Torna alla home"><img src="assets/logo-sc.png" alt="Samuele Casabianca — logo"></a>
+    <nav class="breadcrumb" aria-label="Percorso">
+      <a href="lavoro.html">Lavoro</a>
+      <span class="sep">/</span>
+      <span aria-current="page">Streaming</span>
+    </nav>
+    <div class="nav-right">
+      <a class="nav-contact" href="contattami.html">Contattami</a>
+      <button class="nav-burger" aria-label="Apri il menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main class="page-content">
+    <div class="page-heading">
+      <h1>Streaming</h1>
+      <p>Dirette e contenuti in streaming: sezione in costruzione, i video reali arriveranno presto.</p>
+    </div>
+
+    <!-- Griglia stile piattaforma video: popolata da JS a partire da STREAM_DATA (js/video-data.js) -->
+    <div class="video-grid" id="video-grid"></div>
+  </main>
+
+  <footer class="site-footer">
+    <a class="logo-sc" href="index.html" aria-label="Torna alla home"><img src="assets/logo-sc.png" alt="Samuele Casabianca — logo"></a>
+    <span>Samuele Casabianca — Fotografo, Videomaker e Regista</span>
+  </footer>
+
+  <script src="js/video-data.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    document.getElementById('video-grid').innerHTML = STREAM_DATA.map((v) => `
+      <a class="video-card" href="streaming-watch.html?v=${v.id}">
+        ${videoThumbHtml(v)}
+        <div class="video-info">
+          <div class="video-title">${escapeHtml(v.titolo)}</div>
+          <div class="video-meta">${escapeHtml(v.canale)} · ${escapeHtml(v.durata)}</div>
+        </div>
+      </a>
+    `).join('');
+  </script>
+</body>
+</html>

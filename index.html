@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Samuele Casabianca — Fotografo, Videomaker e Regista</title>
+  <meta name="description" content="Portfolio di Samuele Casabianca, fotografo, videomaker e regista con sede a Milano.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;600&family=Caveat:wght@600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Splash screen di benvenuto (vedi js/splash.js): il logo viene "ritagliato"
+       fuori dal buio da due punti di luce che ne percorrono il perimetro, poi
+       l'intero riquadro vola e si trasforma nel logo reale della nav -->
+  <div class="splash" aria-hidden="true">
+    <div class="splash-stage">
+      <div class="splash-frame">
+        <img src="assets/logo-sc.png" alt="Samuele Casabianca — logo" class="splash-frame-logo">
+      </div>
+      <span class="splash-dot splash-dot--cw"></span>
+      <span class="splash-dot splash-dot--ccw"></span>
+    </div>
+  </div>
+
+  <!-- Nav minimale: solo monogramma + hamburger (la landing è essa stessa il menu) -->
+  <header class="site-nav">
+    <a class="logo-sc" href="index.html" aria-label="Torna alla home"><img src="assets/logo-sc.png" alt="Samuele Casabianca — logo"></a>
+    <div class="nav-right">
+      <button class="nav-burger" aria-label="Apri il menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Nome sopra i pannelli -->
+  <div class="hero-name">
+    <div class="script">Samuele</div>
+    <div class="surname">Casabianca</div>
+    <div class="tagline">Fotografo, Videomaker e Regista</div>
+  </div>
+
+  <!-- Pannelli verticali della landing -->
+  <main class="panels panels--landing">
+    <a class="panel" href="chi-sono.html" data-images="assets/foto/chi-sono/profilo.jpg,assets/foto/chi-sono/verona-1.jpg,assets/foto/chi-sono/verona-2.jpg,assets/foto/chi-sono/verona-3.jpg">
+      <span class="panel-title">Chi Sono</span>
+    </a>
+    <a class="panel" href="lavoro.html" data-images="assets/foto/celebrazioni-matrimonio/_E7A2228.jpg,assets/foto/celebrazioni-feste/1_104.jpg,assets/foto/eventi-aziendali/_E7A8313.jpg,assets/foto/programmi-tv/_E7A5336.jpg,assets/foto/sport-rugby/1_104.jpg">
+      <span class="panel-title">Il Mio Lavoro</span>
+    </a>
+    <!-- TODO: sostituire con foto reale (slideshow del pannello, vedi panels.js) -->
+    <a class="panel panel--static" href="contattami.html">
+      <span class="panel-title">Contattami</span>
+    </a>
+  </main>
+
+  <script src="js/splash.js"></script>
+  <script src="js/panels.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    initVerticalPanels();
+  </script>
+</body>
+</html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Video — Samuele Casabianca</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;600&family=Caveat:wght@600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <header class="site-nav site-nav--solid">
+    <a class="logo-sc" href="index.html" aria-label="Torna alla home"><img src="assets/logo-sc.png" alt="Samuele Casabianca — logo"></a>
+    <nav class="breadcrumb" aria-label="Percorso">
+      <a href="lavoro.html">Lavoro</a>
+      <span class="sep">/</span>
+      <a href="video.html">Video</a>
+      <span class="sep">/</span>
+      <span aria-current="page" id="breadcrumb-title">Video</span>
+    </nav>
+    <div class="nav-right">
+      <a class="nav-contact" href="contattami.html">Contattami</a>
+      <button class="nav-burger" aria-label="Apri il menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main class="page-content">
+    <div class="watch-layout">
+      <div class="watch-main">
+        <!-- Player iniettato da JS: <video controls> reale se la voce di
+             VIDEO_DATA ha un `src`, altrimenti il segnaposto -->
+        <div id="watch-player-slot"></div>
+        <h1 class="watch-title" id="watch-title"></h1>
+        <div class="watch-meta" id="watch-meta"></div>
+        <p class="watch-description" id="watch-description"></p>
+      </div>
+      <aside class="watch-related">
+        <div class="watch-related-list" id="watch-related-list"></div>
+      </aside>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <a class="logo-sc" href="index.html" aria-label="Torna alla home"><img src="assets/logo-sc.png" alt="Samuele Casabianca — logo"></a>
+    <span>Samuele Casabianca — Fotografo, Videomaker e Regista</span>
+  </footer>
+
+  <script src="js/video-data.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const id = Number(params.get('v'));
+    const current = VIDEO_DATA.find((v) => v.id === id) || VIDEO_DATA[0];
+
+    document.getElementById('watch-player-slot').innerHTML = videoPlayerHtml(current);
+    document.getElementById('watch-title').textContent = current.titolo;
+    document.getElementById('watch-meta').textContent = `${current.canale} · ${current.durata}`;
+    document.getElementById('watch-description').textContent = current.descrizione;
+    document.getElementById('breadcrumb-title').textContent = current.titolo;
+    document.title = `${current.titolo} — Samuele Casabianca`;
+
+    // Video correlati: prima quelli della stessa categoria, poi gli altri
+    const others = VIDEO_DATA.filter((v) => v.id !== current.id);
+    const sameCategory = others.filter((v) => v.categoria === current.categoria);
+    const rest = others.filter((v) => v.categoria !== current.categoria);
+    const related = [...sameCategory, ...rest].slice(0, 8);
+
+    document.getElementById('watch-related-list').innerHTML = related.map((v) => `
+      <a class="watch-related-item" href="video-watch.html?v=${v.id}&cat=${v.categoria}">
+        ${videoThumbHtml(v, 'watch-related-thumb')}
+        <div class="watch-related-info">
+          <div class="watch-related-title">${escapeHtml(v.titolo)}</div>
+          <div class="watch-related-meta">${escapeHtml(v.canale)} · ${escapeHtml(v.durata)}</div>
+        </div>
+      </a>
+    `).join('');
+  </script>
+</body>
+</html>
