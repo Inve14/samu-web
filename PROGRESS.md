@@ -86,7 +86,7 @@ punto d'ingresso del "Mio Lavoro").
 
 | File | Descrizione |
 |---|---|
-| `index.html` | Landing: hero col nome + 3 pannelli (Chi Sono / Il Mio Lavoro / Contattami) — foto reali su tutti e tre; Contattami è `panel--static`, quindi una sola foto senza crossfade |
+| `index.html` | Landing: hero col nome + 3 pannelli (Chi Sono / Il Mio Lavoro / Contattami) — foto reali e crossfade su tutti e tre |
 | `chi-sono.html` | Pagina statica bio: ritratto reale (`assets/foto/chi-sono/profilo.jpg`) a sinistra, testo a destra |
 | `lavoro.html` | Hub, 3 pannelli: Foto (foto reali) / Streaming (placeholder) / Video (placeholder) |
 | `foto.html` | 4 pannelli, tutti con foto reali: Programmi TV / Celebrazioni / Eventi / Sport |
@@ -727,13 +727,15 @@ passare al successivo).
     `Map` chiamando `clearInterval` su ogni id rimasto: se il crossfade era
     attivo quando si è navigato via, l'interval resterebbe agganciato in
     memoria dalla bfcache e continuerebbe a cambiare slide anche senza hover.
-  - **Pannello "Contattami" escluso** (`index.html`): ha la classe
-    `panel--static` in più oltre a `.panel`. `panels.js` lo riconosce
-    (`panel.classList.contains('panel--static')`) e gli genera un solo
-    placeholder statico (una sola `.panel-slide`), e **non aggiunge nemmeno i
-    listener** mouseenter/mouseleave/focus/blur per quel pannello — quindi
-    nessun crossfade può mai partire, in nessuna circostanza. Mantiene solo
-    l'hover-expand (flex-grow) comune a tutti i pannelli.
+  - **Meccanismo `panel--static`** (oggi non usato da nessun pannello):
+    `panels.js` riconosce la classe `panel--static`
+    (`panel.classList.contains('panel--static')`) e genera per quel pannello una
+    sola `.panel-slide`, senza aggiungere i listener
+    mouseenter/mouseleave/focus/blur — quindi nessun crossfade può partire, in
+    nessuna circostanza; resta solo l'hover-expand comune a tutti i pannelli.
+    Serviva per il pannello "Contattami" finché non aveva foto reali; ora che ne
+    ha tre in crossfade la classe è stata rimossa, ma il meccanismo resta
+    disponibile per qualsiasi pannello debba restare fermo.
   - **Per usare foto reali nei pannelli**: aggiungere al pannello
     `data-images="assets/foto/categoria/a.jpg,assets/foto/categoria/b.jpg"` —
     il JS le usa come background al posto dei placeholder. Nessun'altra
