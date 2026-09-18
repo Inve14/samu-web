@@ -23,10 +23,12 @@ Nessun build step, nessuna dipendenza (eccetto Google Fonts caricati via CDN):
 - [x] Sitemap ristrutturata: `lavoro.html` ora è un hub (Foto / Streaming / Video),
   `foto.html` contiene le 4 categorie fotografiche (vedi albero sotto)
 - [x] Pagine di navigazione a pannelli: `foto.html` (4), `celebrazioni.html` (2), `eventi.html` (3)
+- [x] **Eventi semplificata a galleria diretta** (come Sport e Programmi TV)
 - [x] **Sport semplificata a galleria diretta** (come Programmi TV): niente più
   sotto-categorie Rugby/Calcio/Pallavolo — vedi "Sport: da pannelli a galleria diretta"
 - [x] Componente galleria masonry + hover zoom + lightbox (`js/main.js`)
-- [x] 9 pagine galleria (foglie): 5 con foto reali, 4 ancora con placeholder (foto mancanti)
+- [x] 5 pagine galleria, tutte con foto reali — nessun riquadro segnaposto residuo
+  nel sito dopo l'unificazione di Sport ed Eventi
 - [x] `chi-sono.html` — bio con ritratto reale
 - [x] `contattami.html` — form mailto + contatti
 - [x] Responsive: pannelli impilati su mobile, menu hamburger overlay
@@ -48,8 +50,9 @@ Nessun build step, nessuna dipendenza (eccetto Google Fonts caricati via CDN):
   contorno (due punti che tracciano il perimetro) all'apertura, poi volo FLIP
   (via `transform`) verso il logo della nav — vedi "Decisioni prese", voce
   **Logo reale**
-- [ ] Foto reali per Eventi → Brand/Gala e Sport → Calcio/Pallavolo (nessun file
-  disponibile in `immagini/` per queste 4 categorie — placeholder in attesa)
+- [ ] Foto reali per Brand/Gala (Eventi) e Calcio/Pallavolo (Sport): nessun file
+  disponibile in `immagini/`; quando arriveranno vanno aggiunte alle masonry di
+  `eventi.html` e `sport.html`
 - [x] **Video reali collegati** (22 file da `immagini/PORTFOLIO/VIDEO/`): griglia,
   filtri, pagine di riproduzione con `<video controls>` reale e miniature
   estratte dal video — vedi "Video reali inseriti" più sotto
@@ -66,10 +69,7 @@ lavoro.html                     → 3 pannelli: Foto | Streaming | Video
 │   ├── celebrazioni.html       → 2 pannelli: Feste Private | Matrimoni
 │   │   ├── celebrazioni-feste-private.html   → galleria
 │   │   └── celebrazioni-matrimoni.html       → galleria
-│   ├── eventi.html             → 3 pannelli: Aziendali | Brand | Gala
-│   │   ├── eventi-aziendali.html             → galleria
-│   │   ├── eventi-brand.html                 → galleria
-│   │   └── eventi-gala.html                  → galleria
+│   ├── eventi.html             → galleria diretta (come programmi-tv.html)
 │   ├── programmi-tv.html       → galleria diretta
 │   └── sport.html              → galleria diretta (come programmi-tv.html)
 ├── streaming.html               → griglia stile YouTube/Twitch (in costruzione lato contenuti)
@@ -91,14 +91,11 @@ punto d'ingresso del "Mio Lavoro").
 | `lavoro.html` | Hub, 3 pannelli: Foto (foto reali) / Streaming (placeholder) / Video (placeholder) |
 | `foto.html` | 4 pannelli, tutti con foto reali: Programmi TV / Celebrazioni / Eventi / Sport |
 | `celebrazioni.html` | 2 pannelli con foto reali: Matrimoni / Feste Private |
-| `eventi.html` | 3 pannelli: Aziendali (foto reali) / Brand (placeholder, nessuna foto disponibile) / Gala (placeholder, nessuna foto disponibile) |
+| `eventi.html` | Galleria diretta — 50 foto reali (ex Aziendali/Brand/Gala unite) |
 | `sport.html` | Galleria diretta — 54 foto reali (ex Rugby/Calcio/Pallavolo unite) |
 | `programmi-tv.html` | Galleria — 17 foto reali |
 | `celebrazioni-matrimoni.html` | Galleria — 47 foto reali |
 | `celebrazioni-feste-private.html` | Galleria — 28 foto reali |
-| `eventi-aziendali.html` | Galleria — 50 foto reali |
-| `eventi-brand.html` | Galleria (11 placeholder — nessuna foto disponibile) |
-| `eventi-gala.html` | Galleria (13 placeholder — nessuna foto disponibile) |
 | `streaming.html` | Griglia stile YouTube/Twitch, 10 card placeholder (dati da `js/video-data.js`) |
 | `streaming-watch.html` | Pagina di riproduzione streaming (player placeholder + correlati), legge `?v=ID` |
 | `video.html` | Griglia stile YouTube con filtri Tutti/Eventi/Matrimoni/Sport, **22 card reali** (6 eventi, 1 matrimoni, 15 sport) |
@@ -473,6 +470,63 @@ generale.
   Matrimoni/Feste Private), `eventi.html` (3 pannelli → Aziendali/Brand/Gala),
   `programmi-tv.html` invariata. Streaming e Video non toccati.
 
+## Eventi: da pannelli a galleria diretta
+
+Stessa semplificazione già applicata a Sport: **Eventi ora si comporta come
+Programmi TV e Sport** — dal menu Foto si clicca "Eventi" e si apre subito la
+galleria, senza il passaggio intermedio a pannelli.
+
+```
+PRIMA                                      DOPO
+foto.html                                  foto.html
+└── eventi.html     → 3 pannelli           └── eventi.html  → galleria diretta
+    ├── eventi-aziendali.html → galleria       (50 foto)
+    ├── eventi-brand.html     → galleria
+    └── eventi-gala.html      → galleria
+```
+
+### Cosa è stato fatto
+
+- **`eventi.html` riscritta**: da pagina a pannelli a galleria masonry, con la
+  stessa identica struttura di `sport.html` (verificata per confronto:
+  `.masonry` / `.masonry-item`, `loading="lazy"`, lightbox via `js/main.js`,
+  nav `site-nav--solid`, footer standard). Non include più `js/panels.js`.
+- **Breadcrumb**: da "Lavoro / Foto / Eventi / Aziendali" a
+  **"Lavoro / Foto / Eventi"**, con `Eventi` come `aria-current="page"`.
+- **Pagine rimosse**: `eventi-aziendali.html`, `eventi-brand.html`,
+  `eventi-gala.html`.
+- **Link**: nessuna modifica necessaria. Il pannello "Eventi" di `foto.html` e la
+  voce del menu hamburger puntavano già a `eventi.html`.
+- **Cartella asset invariata**: le foto restano in `assets/foto/eventi-aziendali/`.
+
+### Le foto unite sono 50, non 74
+
+Come per Sport, unire le tre gallerie significa in pratica unire **solo quelle
+Aziendali**, le uniche reali: `eventi-brand.html` aveva 11 placeholder e
+`eventi-gala.html` 13, riquadri grigi generati via CSS che non sono stati
+riportati nella nuova galleria. L'`alt` delle immagini è passato da "Evento
+aziendale — foto N" a "Eventi — foto N" e il sottotitolo è stato generalizzato,
+dato che la pagina ora copre gli eventi in generale.
+
+Quando arriveranno foto di Brand o Gala basterà aggiungerle alla masonry di
+`eventi.html`, senza ricreare nessuna sotto-pagina.
+
+## Deploy
+
+Il sito è **online su https://samuelecasabianca.com**.
+
+- **Repository**: `github.com/Inve14/samu-web`, branch `main`.
+- **Hosting**: Vercel, progetto `samu-web`, collegato al repository — **ogni push
+  su `main` ridistribuisce automaticamente**, non serve nessun comando.
+- **Dominio**: registrato su Namecheap, DNS gestito da Namecheap BasicDNS con un
+  record `A` su `@` e un `CNAME` su `www` che puntano a Vercel. Certificato
+  HTTPS emesso da Vercel.
+- **Cosa non sta nel repo** (vedi `.gitignore`): gli originali di `immagini/`,
+  tutti i file `.mp4` e i PDF. I video saranno ospitati su YouTube e mostrati
+  via embed: al momento `js/video-data.js` punta ancora ai file locali, quindi
+  **online le pagine di riproduzione non funzionano** finché non si sostituiscono
+  i `src` con gli identificativi YouTube.
+
 ## Bugfix
 
 Tre problemi emersi testando il sito dopo l'inserimento delle foto reali,
@@ -779,21 +833,20 @@ passare al successivo).
 **Foto mancanti** (nessun file disponibile in `immagini/`, vedi "Immagini reali
 inserite" — quando arriveranno, seguire la stessa pipeline di ottimizzazione
 descritta lì prima di collegarle):
-- Pannello "Brand" e "Gala" su `eventi.html` (e relativa anteprima su `foto.html`)
+- Foto di Brand e Gala: non esistono più pannelli/gallerie dedicati (Eventi è
+  una galleria unica), quindi quando arriveranno andranno semplicemente aggiunte
+  alla masonry di `eventi.html`
 - Foto di calcio e pallavolo: non esistono più pannelli/gallerie dedicati (Sport
   è una galleria unica), quindi quando arriveranno andranno semplicemente
   aggiunte alla masonry di `sport.html`
-- `eventi-brand.html` — galleria, 11 placeholder
-- `eventi-gala.html` — galleria, 13 placeholder
 
-**Streaming e Video** (sostituire i due array in `js/video-data.js`, e il
-player placeholder `.watch-player` nelle pagine di riproduzione con un embed
-reale — non toccati in questo passaggio):
-- `STREAM_DATA` — 10 voci placeholder per `streaming.html`/`streaming-watch.html`
-- `VIDEO_DATA` — 12 voci placeholder (4 Eventi, 4 Matrimoni, 4 Sport) per
-  `video.html`/`video-watch.html`
-- Pannello "Streaming" e "Video" su `lavoro.html` (badge "Contenuti in arrivo"
-  sul primo)
+**Streaming** (sostituire l'array `STREAM_DATA` in `js/video-data.js`):
+- 10 voci placeholder per `streaming.html`/`streaming-watch.html`; la cartella
+  sorgente `immagini/PORTFOLIO/STREAMING/` è ancora vuota
+- Pannello "Streaming" su `lavoro.html` (badge "Contenuti in arrivo")
+
+> *Nota*: `VIDEO_DATA` **non** è più un placeholder — contiene i 22 video reali
+> con `src` e `poster`. Vedi "Video reali: 22 file inseriti".
 
 **Altri**:
 - `contattami.html` — email reale (anche in `js/main.js`, funzione
