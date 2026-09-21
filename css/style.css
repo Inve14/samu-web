@@ -29,9 +29,11 @@
 
   /* Varie */
   --nav-height: 64px;
+  --social-row-height: 5.5rem;    /* riga social sotto i pannelli */
   --transition-fast: 0.3s ease;
   --transition-slow: 0.6s cubic-bezier(0.4, 0, 0.2, 1);
   --radius: 4px;
+  --radius-frame: 18px;           /* riquadri smussati: splash e pannelli */
 }
 
 /* ---------- Reset minimo ---------- */
@@ -283,11 +285,19 @@ button {
 /* ==========================================================================
    Componente "pannelli verticali" (vedi js/panels.js)
    ========================================================================== */
+/* I pannelli non occupano più tutta la finestra: partono sotto la nav, hanno
+   un margine laterale allineato alla nav e lasciano spazio sotto per la riga
+   social (.social-links). L'altezza è "finestra meno nav e riga social",
+   con un minimo (finestre molto basse: meglio scorrere che schiacciarli) e
+   un massimo (monitor molto alti). A 1440x900: 900 - 64 - 88 = 748px.
+   Ogni pannello è un riquadro staccato ad angoli smussati (stesso raggio del
+   riquadro dello splash), separato dagli altri da `gap`. */
 .panels {
   display: flex;
-  height: 100vh;
-  height: 100dvh; /* mobile: evita salti con la barra del browser */
-  overflow: hidden;
+  gap: var(--space-sm);
+  margin: var(--nav-height) var(--space-md) 0;
+  height: clamp(22rem, calc(100vh - var(--nav-height) - var(--social-row-height)), 60rem);
+  height: clamp(22rem, calc(100dvh - var(--nav-height) - var(--social-row-height)), 60rem);
 }
 
 .panel {
@@ -298,12 +308,9 @@ button {
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  border-radius: var(--radius-frame);
+  isolation: isolate; /* Safari: ritaglio sugli angoli anche per il collage animato */
   transition: flex-grow var(--transition-slow);
-  border-right: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-.panel:last-child {
-  border-right: none;
 }
 
 .panel:hover,
@@ -346,6 +353,56 @@ button {
 
 .panel-slide.is-active {
   opacity: 1;
+}
+
+/* Collage a scorrimento (pannelli .panel--scroll, generato da panels.js →
+   buildMontage). La traccia contiene due gruppi identici: l'animazione la
+   porta da -50% (secondo gruppo in vista) a 0 (primo gruppo, identico), cioè
+   il contenuto scende e il loop si richiude senza stacchi. Solo transform,
+   quindi resta sul compositor. Parte solo con .is-running (aggiunta da JS
+   se l'utente non ha chiesto movimento ridotto). */
+.panel-montage {
+  --montage-unit: 9rem;  /* altezza di una tessera bassa; le alte sono 2 unità */
+  --montage-gap: 4px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  transform: translateY(-50%);
+}
+
+.panel-montage.is-running {
+  animation: panel-montage-scroll 50s linear infinite;
+  will-change: transform;
+}
+
+@keyframes panel-montage-scroll {
+  from { transform: translateY(-50%); }
+  to   { transform: translateY(0); }
+}
+
+/* Il gap è sotto ogni tessera (anche l'ultima), non fra i gruppi: così i due
+   gruppi hanno esattamente la stessa altezza e la giunzione è invisibile. */
+.panel-montage-group {
+  display: flex;
+  gap: var(--montage-gap);
+}
+
+.panel-montage-col {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.panel-montage-tile {
+  height: var(--montage-unit);
+  margin-bottom: var(--montage-gap);
+  background-size: cover;
+  background-position: center;
+  background-color: var(--color-placeholder);
+}
+
+.panel-montage-tile--tall {
+  height: calc(var(--montage-unit) * 2 + var(--montage-gap));
 }
 
 /* Variante placeholder della slide: bordo tratteggiato + etichetta "Foto N".
@@ -421,6 +478,38 @@ button {
   text-transform: uppercase;
   text-align: center;
   color: var(--color-accent);
+}
+
+/* ---------- Riga social sotto i pannelli ---------- */
+.social-links {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-md);
+  height: var(--social-row-height);
+}
+
+.social-link {
+  display: inline-flex;
+  padding: 0.4rem; /* area cliccabile più comoda dell'icona da 24px */
+  color: var(--color-text-muted);
+  transition: color var(--transition-fast);
+}
+
+.social-link:hover,
+.social-link:focus-visible {
+  color: var(--color-accent);
+}
+
+.social-link:focus-visible {
+  outline: 1px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.social-link svg {
+  display: block;
+  width: 24px;
+  height: 24px;
 }
 
 /* ---------- Hero overlay sulla landing (index.html) ---------- */
@@ -1044,11 +1133,14 @@ button {
   background-color: var(--color-placeholder);
   background-size: cover;
   background-position: center;
+  /* Parte con lo stesso raggio del pannello e lo perde mentre si espande */
+  border-radius: var(--radius-frame);
   transition:
     top 0.55s cubic-bezier(0.65, 0, 0.35, 1),
     left 0.55s cubic-bezier(0.65, 0, 0.35, 1),
     width 0.55s cubic-bezier(0.65, 0, 0.35, 1),
-    height 0.55s cubic-bezier(0.65, 0, 0.35, 1);
+    height 0.55s cubic-bezier(0.65, 0, 0.35, 1),
+    border-radius 0.55s cubic-bezier(0.65, 0, 0.35, 1);
 }
 
 /* Stessa velatura scura dei pannelli, per continuità visiva */
@@ -1072,11 +1164,13 @@ button {
   width: 100vw !important;
   height: 100vh !important;
   height: 100dvh !important;
+  border-radius: 0;
 }
 
 /* Il resto della pagina sfuma mentre il clone cresce */
 .is-leaving .panel,
-.is-leaving .hero-name {
+.is-leaving .hero-name,
+.is-leaving .social-links {
   opacity: 0;
   transition: opacity 0.35s ease;
 }
@@ -1162,7 +1256,7 @@ button {
    (clip-path chiuso, non semplice opacity: 0) e viene "rivelato" dall'alto
    verso il basso in sincrono col percorso dei due punti (stessa durata). */
 .splash-frame {
-  --splash-frame-radius: 18px;
+  --splash-frame-radius: var(--radius-frame);
   position: absolute;
   inset: 0;
   display: flex;
@@ -1323,24 +1417,28 @@ button {
     display: none; /* su mobile il link Contattami vive nel menu overlay */
   }
 
-  /* Pannelli impilati verticalmente, niente hover-expand */
+  /* Pannelli impilati verticalmente, niente hover-expand. Riempiono almeno
+     lo spazio tra nav e riga social (con pochi pannelli, es. Celebrazioni,
+     si allungano invece di lasciare un vuoto); con molti la pagina scorre e
+     la riga social segue sotto. */
   .panels {
     flex-direction: column;
+    gap: 0.75rem;
+    margin: var(--nav-height) var(--space-sm) 0;
     height: auto;
-    min-height: 100vh;
-    min-height: 100dvh;
+    min-height: calc(100vh - var(--nav-height) - var(--social-row-height));
+    min-height: calc(100dvh - var(--nav-height) - var(--social-row-height));
   }
 
   .panel {
-    flex: none;
+    flex: 1 0 auto;
     min-height: 30vh;
-    border-right: none;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   }
 
+  /* Stesso flex-grow di base: nessun allargamento in hover */
   .panel:hover,
   .panel:focus-visible {
-    flex-grow: 0;
+    flex-grow: 1;
   }
 
   .panel:hover .panel-title {
@@ -1411,5 +1509,12 @@ button {
 
   .splash-dot {
     display: none;
+  }
+
+  /* Collage fermo (panels.js già non aggiunge .is-running: doppia sicurezza,
+     perché la regola generale sopra renderebbe l'animazione infinita
+     velocissima invece di fermarla) */
+  .panel-montage.is-running {
+    animation: none;
   }
 }

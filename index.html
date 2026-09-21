@@ -47,7 +47,10 @@
     <a class="panel" href="chi-sono.html" data-images="assets/foto/chi-sono/profilo.jpg,assets/foto/chi-sono/verona-1.jpg,assets/foto/chi-sono/verona-2.jpg,assets/foto/chi-sono/verona-3.jpg">
       <span class="panel-title">Chi Sono</span>
     </a>
-    <a class="panel" href="lavoro.html" data-images="assets/foto/celebrazioni-matrimonio/_E7A2228.jpg,assets/foto/celebrazioni-feste/1_104.jpg,assets/foto/eventi-aziendali/_E7A8313.jpg,assets/foto/programmi-tv/_E7A5336.jpg,assets/foto/sport-rugby/1_104.jpg">
+    <!-- Collage a scorrimento continuo (panel--scroll, vedi js/panels.js):
+         12 foto, 3 per categoria (celebrazioni, eventi, programmi TV, sport),
+         alternate fra le due colonne; le verticali cadono negli slot alti -->
+    <a class="panel panel--scroll" href="lavoro.html" data-images="assets/foto/eventi-aziendali/1_41.jpg,assets/foto/programmi-tv/_E7A5336.jpg,assets/foto/celebrazioni-matrimonio/_E7A2228.jpg,assets/foto/sport-rugby/1_164.jpg,assets/foto/programmi-tv/_E7A6711.jpg,assets/foto/celebrazioni-feste/1_104.jpg,assets/foto/sport-rugby/1_30.jpg,assets/foto/programmi-tv/_E7A6087.jpg,assets/foto/celebrazioni-matrimonio/12529.jpg,assets/foto/eventi-aziendali/_E7A8313.jpg,assets/foto/eventi-aziendali/1_114.jpg,assets/foto/sport-rugby/1_104.jpg">
       <span class="panel-title">Il Mio Lavoro</span>
     </a>
     <!-- Tre foto in crossfade come gli altri pannelli: la conversazione a un
@@ -57,6 +60,24 @@
       <span class="panel-title">Contattami</span>
     </a>
   </main>
+
+  <!-- Riga social sotto i pannelli: icone SVG inline (nessuna risorsa esterna) -->
+  <nav class="social-links" aria-label="Profili social">
+    <a class="social-link" href="https://www.instagram.com/ph.samuele/?hl=it" target="_blank" rel="noopener" aria-label="Instagram di Samuele Casabianca (si apre in una nuova scheda)">
+      <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+        <rect x="2" y="2" width="20" height="20" rx="5"/>
+        <circle cx="12" cy="12" r="4.2"/>
+        <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+      </svg>
+    </a>
+    <a class="social-link" href="https://www.linkedin.com/in/samuele-casabianca-0387b7237/" target="_blank" rel="noopener" aria-label="LinkedIn di Samuele Casabianca (si apre in una nuova scheda)">
+      <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+        <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/>
+        <rect x="2" y="9" width="4" height="12"/>
+        <circle cx="4" cy="4" r="2"/>
+      </svg>
+    </a>
+  </nav>
 
   <script src="js/splash.js"></script>
   <script src="js/panels.js"></script>

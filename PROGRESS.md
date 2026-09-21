@@ -50,6 +50,13 @@ Nessun build step, nessuna dipendenza (eccetto Google Fonts caricati via CDN):
   contorno (due punti che tracciano il perimetro) all'apertura, poi volo FLIP
   (via `transform`) verso il logo della nav — vedi "Decisioni prese", voce
   **Logo reale**
+- [x] **Pannelli non più a tutta altezza + riga social** sulle 4 pagine a pannelli
+  (index, lavoro, foto, celebrazioni): pannelli con altezza fluida e margini
+  laterali, icone Instagram/LinkedIn sotto — vedi "Pannelli ridimensionati e riga social"
+- [x] **Link social reali** (Instagram `@ph.samuele`, LinkedIn), **pannelli come
+  riquadri staccati ad angoli smussati** e **collage a scorrimento** sul pannello
+  "Il Mio Lavoro" della home — vedi "Social reali, pannelli smussati, collage a
+  scorrimento"
 - [ ] Foto reali per Brand/Gala (Eventi) e Calcio/Pallavolo (Sport): nessun file
   disponibile in `immagini/`; quando arriveranno vanno aggiunte alle masonry di
   `eventi.html` e `sport.html`
@@ -58,7 +65,8 @@ Nessun build step, nessuna dipendenza (eccetto Google Fonts caricati via CDN):
   estratte dal video — vedi "Video reali inseriti" più sotto
 - [ ] Contenuti reali di Streaming (struttura pronta, ma
   `immagini/PORTFOLIO/STREAMING/` è ancora **vuota**: nessun file arrivato)
-- [ ] Contatti reali (email, Instagram, LinkedIn — ora segnaposto)
+- [ ] Email reale (ora segnaposto). Instagram e LinkedIn sono già reali, sia in
+  `contattami.html` sia nella riga `.social-links` delle pagine a pannelli
 - [ ] Deploy/hosting (fuori scope per questa fase)
 
 ## Sitemap
@@ -86,7 +94,7 @@ punto d'ingresso del "Mio Lavoro").
 
 | File | Descrizione |
 |---|---|
-| `index.html` | Landing: hero col nome + 3 pannelli (Chi Sono / Il Mio Lavoro / Contattami) — foto reali e crossfade su tutti e tre |
+| `index.html` | Landing: hero col nome + 3 pannelli (Chi Sono / Il Mio Lavoro / Contattami) — foto reali; crossfade su Chi Sono e Contattami, collage a scorrimento continuo (`panel--scroll`) su Il Mio Lavoro |
 | `chi-sono.html` | Pagina statica bio: ritratto reale (`assets/foto/chi-sono/profilo.jpg`) a sinistra, testo a destra |
 | `lavoro.html` | Hub, 3 pannelli: Foto (foto reali) / Streaming (placeholder) / Video (placeholder) |
 | `foto.html` | 4 pannelli, tutti con foto reali: Programmi TV / Celebrazioni / Eventi / Sport |
@@ -511,6 +519,204 @@ dato che la pagina ora copre gli eventi in generale.
 Quando arriveranno foto di Brand o Gala basterà aggiungerle alla masonry di
 `eventi.html`, senza ricreare nessuna sotto-pagina.
 
+## Pannelli ridimensionati e riga social
+
+Le pagine a pannelli (`index.html`, `lavoro.html`, `foto.html`,
+`celebrazioni.html`) non occupano più esattamente l'altezza della finestra: i
+pannelli restano grandi ma lasciano spazio sotto per una riga di icone social
+sempre visibile senza scorrere.
+
+### Cosa è cambiato
+
+- **`.panels` (desktop)**: non più `height: 100vh/100dvh`. Ora
+  `margin: var(--nav-height) var(--space-md) 0` (partono sotto la nav, margine
+  laterale di 2rem allineato al padding della nav; *poi*: niente più raggio sul
+  contenitore, i pannelli sono riquadri smussati separati, vedi sezione successiva)
+  e
+  `height: clamp(22rem, calc(100dvh - var(--nav-height) - var(--social-row-height)), 60rem)`
+  (con fallback `vh` sulla riga prima). A 1440x900: 900 − 64 − 88 = **748px**
+  di pannelli, pagina alta esattamente 900, nessuno scroll. Il minimo evita
+  pannelli schiacciati su finestre molto basse (lì si scorre), il massimo li
+  ferma sui monitor molto alti.
+- **Nuova variabile** `--social-row-height: 5.5rem` in `:root`: altezza della
+  riga social, usata sia dalla riga sia dal calcolo dell'altezza dei pannelli —
+  se si cambia, restano allineati da soli.
+- **Riga social** `<nav class="social-links" aria-label="Profili social">`
+  subito dopo `</main>` nelle 4 pagine, con due `<a class="social-link">`
+  (Instagram, LinkedIn): SVG inline 24px a contorno (`stroke="currentColor"`,
+  `aria-hidden`), `aria-label` descrittivo, `target="_blank" rel="noopener"`.
+  Colore `--color-text-muted`, hover/focus `--color-accent`. Nessuna risorsa
+  esterna (il sito continua a caricare solo Google Fonts). *(Link reali inseriti
+  nel passaggio successivo, vedi sotto.)*
+- **Uscita**: `.is-leaving .social-links` sfuma insieme a pannelli e nome.
+- **Mobile (≤768px)**: pannelli sempre impilati, margini laterali
+  `var(--space-sm)`, `min-height` del contenitore = finestra − nav − riga social,
+  e `.panel { flex: 1 0 auto }` (prima `flex: none`) con `flex-grow: 1` anche in
+  hover (quindi nessun allargamento, come prima). Effetto: con pochi pannelli
+  (Celebrazioni, 2) riempiono lo schermo e la riga social si vede senza
+  scorrere, invece di lasciare il vuoto che lasciava il vecchio
+  `min-height: 100dvh` con pannelli `flex: none`; con 3–4 pannelli la pagina
+  scorre e la riga social arriva subito dopo l'ultimo.
+- `js/panels.js` **non è stato toccato**.
+
+### Punti delicati controllati
+
+- **Cover d'ingresso** (`.panels-cover`): resta a schermo pieno di proposito.
+  La pagina precedente finisce con il clone espanso a tutto schermo, quindi la
+  cover deve coprire tutto (anche margini e riga social) per dare continuità.
+  La riga social non è posizionata, quindi resta sotto la cover e compare
+  quando la cover sfuma.
+- **Uscita** (`.panel-expander`): `panels.js` legge il rettangolo con
+  `getBoundingClientRect()`, quindi segue da solo il nuovo layout. Verificato:
+  il clone parte esattamente dal pannello (es. `left 331, top 64`, cioè sotto
+  la nav) e arriva a tutto schermo.
+- **Nome in home** (`.hero-name`, `top: clamp(4.5rem, 12vh, 8rem)`): a 1440x900
+  sta a y=108, cioè 44px dentro i pannelli (che partono a 64): sovrapposto ai
+  pannelli come prima, nessun buco sopra, niente sotto la nav.
+- **Viso Chi Sono** (`background-position: center top`): visibile sia a riposo
+  sia col pannello allargato in hover, su più foto del crossfade. Su mobile il
+  nome copre la parte alta del primo pannello come già prima (la tagline passa
+  sui capelli), ma il viso resta scoperto — anzi un po' più in basso di prima,
+  perché ora il pannello parte sotto la nav.
+- **`prefers-reduced-motion`**: il layout non dipende dalle classi delle
+  animazioni; simulato sostituendo `matchMedia` prima di `panels.js`: nessun
+  `.panel--closed`, nessuna cover, stesse misure della versione animata.
+
+### Verifiche fatte in browser (Chrome, `python3 -m http.server 8000`)
+
+Il viewport reale della finestra Chrome era 1360x617 (limitato dallo schermo),
+quindi le misure a 1440x900 e 375x800 sono state prese caricando le pagine in
+un iframe di quelle dimensioni esatte sulla stessa origine.
+
+- **1440x900, tutte e 4 le pagine**: `scrollWidth` 1440, `scrollHeight` 900
+  (nessuno scroll), pannelli 32,64 → 1376x748, icone 24x24 a y=844–868.
+- **375x800**: nessuno scroll orizzontale in nessuna pagina; riga social subito
+  sotto l'ultimo pannello (index 912, lavoro 784, foto 1024, celebrazioni 712),
+  nessuna sovrapposizione; Celebrazioni sta tutta in 800px.
+- **Hover** (finestra reale): il pannello passa a `flex-grow: 1.6` (479px contro
+  299) e il crossfade cambia slide.
+- **Navigazione**: foto → celebrazioni e home → lavoro con clone che si espande
+  dal rettangolo giusto e ingresso a pannelli chiusi → aperti; nessun
+  `.panel--closed`/cover/expander residuo.
+- **Console**: nessun errore sulle 4 pagine.
+- Non verificato: un monitor fisico a 1440x900 (solo iframe), Safari/Firefox,
+  dispositivi touch reali.
+
+## Social reali, pannelli smussati, collage a scorrimento
+
+Tre modifiche nello stesso passaggio.
+
+### 1. Link social reali
+
+- Instagram: `https://www.instagram.com/ph.samuele/?hl=it`
+- LinkedIn: `https://www.linkedin.com/in/samuele-casabianca-0387b7237/`
+
+Inseriti nella riga `.social-links` delle 4 pagine a pannelli (rimosso il TODO)
+e in `contattami.html`, dove era anche sbagliato il testo del link Instagram:
+mostrava `@samuelecasabianca`, un nome inventato, ora `@ph.samuele`. In
+`contattami.html` resta un TODO solo per l'email, ancora segnaposto. Nel sito non
+resta nessun `href="#"`.
+
+### 2. Pannelli come riquadri staccati ad angoli smussati
+
+- **Nuova variabile** `--radius-frame: 18px` in `:root`, condivisa: lo splash ora
+  usa `--splash-frame-radius: var(--radius-frame)` (stesso valore di prima),
+  così splash e pannelli non possono divergere.
+- `.panel`: `border-radius: var(--radius-frame)` + `isolation: isolate` (su
+  Safari, senza un nuovo contesto di impilamento, i figli animati via
+  `transform` — il collage — possono uscire dagli angoli arrotondati).
+  **Rimossi** il separatore `border-right` (e la regola `:last-child`) su desktop
+  e `border-bottom` su mobile.
+- `.panels`: `gap: var(--space-sm)` (16px) su desktop, `0.75rem` su mobile; tolti
+  `border-radius`/`overflow: hidden` dal contenitore, ormai inutili. I margini
+  verso i bordi della pagina restano quelli del passaggio precedente (2rem
+  desktop, 1rem mobile, sotto la nav).
+- `.panel-expander`: parte con `border-radius: var(--radius-frame)` e in
+  `.is-full` va a `0`, con una transizione `border-radius` che ha la stessa
+  durata e curva di top/left/width/height (0.55s). Nessuno stacco a inizio
+  animazione: misurato 18px → ~12.6px a metà → 0px a schermo pieno.
+- L'animazione di ingresso (scaleX/scaleY dei pannelli) non è stata toccata: gli
+  angoli si deformano per il mezzo secondo dello split, non si nota.
+
+### 3. Collage a scorrimento su "Il Mio Lavoro" (solo home)
+
+- **Markup** (`index.html`): il pannello verso `lavoro.html` ha la classe
+  `panel--scroll` e `data-images` con **12 foto**, 3 per categoria (celebrazioni
+  — matrimonio/feste —, eventi, programmi TV, sport), ~3,2 MB in totale; 5 di
+  queste erano già caricate dal crossfade precedente dello stesso pannello, quindi
+  il peso nuovo per la home è circa 2 MB. L'ordine alterna le categorie e fa
+  cadere le 3 foto verticali negli slot alti.
+- **JS** (`js/panels.js`): nel ciclo che crea le slide, un pannello
+  `panel--scroll` con foto chiama `buildMontage()` e salta tutto il resto (niente
+  slide, niente `setInterval`, niente listener di hover/focus). Senza
+  `data-images` ricade sul comportamento normale. Gli altri pannelli fanno il
+  crossfade esattamente come prima (codice non toccato).
+- **Struttura del collage**: `.panel-montage` (traccia) > **2 copie identiche**
+  di `.panel-montage-group` > 2 `.panel-montage-col` > `.panel-montage-tile` (foto
+  come `background-image`, cover, come le slide). Le foto si alternano fra le due
+  colonne; le tessere seguono lo schema alta/bassa sfasato fra le colonne, così
+  le due colonne hanno la stessa altezza (9 unità ciascuna) e il gruppo non ha
+  buchi in fondo. Il gap è sotto ogni tessera (anche l'ultima), non fra i gruppi:
+  i due gruppi hanno altezza identica.
+- **Animazione** (CSS): `@keyframes panel-montage-scroll` da `translateY(-50%)` a
+  `translateY(0)`, `50s linear infinite` — il contenuto scende; a fine ciclo la
+  traccia mostra esattamente ciò che mostrava all'inizio, quindi il loop non ha
+  stacchi. Solo `transform` (+ `will-change`), quindi resta sul compositor.
+  L'unità di altezza è fissa (`--montage-unit: 9rem`): un gruppo è alto ~1332px,
+  più di qualsiasi altezza del pannello (max 60rem), requisito perché la
+  traccia copra sempre tutto il pannello. Velocità ~26px/s. Continua anche
+  senza mouse; l'hover-expand (`flex-grow: 1.6`) resta come sugli altri pannelli.
+- **Reduced motion**: `panels.js` aggiunge `.is-running` (la classe che attiva
+  l'animazione) solo se l'utente non ha chiesto movimento ridotto, quindi il
+  collage resta fermo. In più, nella media query `prefers-reduced-motion`,
+  `.panel-montage.is-running { animation: none; }` come doppia sicurezza: la
+  regola generale `animation-duration: 0.01ms !important` da sola non
+  fermerebbe un'animazione `infinite`, la farebbe girare velocissima.
+- **Uscita (punto critico)**: `setupPanelsExit()` copiava lo sfondo da
+  `.panel-slide.is-active`, che un pannello a scorrimento non ha. Ora, se quella
+  query dà `null` e il pannello è `panel--scroll`, usa
+  `mostVisibleMontageTile(panel)`: la tessera con l'area visibile maggiore
+  dentro il pannello nel momento del click (i rettangoli tengono conto del
+  `transform` in corso). Il clone parte quindi da quella foto; il salvataggio del
+  colore in `sessionStorage` segue la stessa logica di prima (una tessera con
+  foto ha sfondo trasparente, quindi, come per le altre slide con foto, non si
+  salva nulla e la cover usa il colore standard).
+
+### Verifiche fatte in browser (Chrome, `python3 -m http.server 8000`)
+
+Come nel passaggio precedente, la finestra reale era 1440x561 e le misure a
+1440x900 e 375x800 sono state prese in un iframe di quelle dimensioni. Nota: il
+browser teneva `panels.js` vecchio in cache, quindi JS/CSS sono stati ricaricati
+forzando la cache prima dei test.
+
+- **Home, 3 pannelli**: Chi Sono e Contattami con crossfade in hover (slide
+  attiva cambiata, `flex-grow` 1.6); Il Mio Lavoro scorre **senza mouse sopra**
+  (`transform` da −1190 a −1137px in 2 s). Loop: fotogramma a 49.999 s e a 0 s
+  confrontati, **identici**. Gruppi alti uguali (1332/1332px), 24 tessere.
+- **Click su "Il Mio Lavoro"**: clone con la foto `programmi-tv/_E7A6711.jpg`
+  (la tessera più visibile), rettangolo di partenza uguale al pannello, raggio
+  18px → 0, schermo pieno, arrivo su `lavoro.html`.
+- **Altre uscite**: lavoro → foto, foto → celebrazioni, celebrazioni →
+  celebrazioni-matrimoni: tutte partono dal rettangolo giusto con la foto della
+  slide attiva, raggio 18 → 0.
+- **1440x900**: tutte e 4 le pagine alte 900, `scrollWidth` 1440; pannelli a
+  748px di altezza, 16px fra l'uno e l'altro, 32px dai bordi, raggio 18px, nessun
+  `border-right`.
+- **375x800**: nessuno scroll orizzontale; pannelli impilati con 12px fra l'uno e
+  l'altro, riga social dopo l'ultimo; Celebrazioni sta in 800px; collage attivo
+  anche su mobile e ritagliato dagli angoli smussati.
+- **Reduced motion** (simulato sostituendo `matchMedia` prima di `panels.js`),
+  1440x900 e 375x800: nessuna `.is-running`, 0 animazioni sul collage,
+  `transform` fermo, layout invariato.
+- **Social**: `href`, `target="_blank"` e `rel="noopener"` corretti nelle 4
+  pagine e in `contattami.html`. Click reale sulle due icone: la pagina di
+  partenza resta dov'è (quindi si apre una nuova scheda), ma le nuove schede si
+  aprono fuori dal gruppo di schede controllato dallo strumento di test, quindi
+  **l'URL effettivamente caricato su Instagram/LinkedIn non è stato letto**.
+- **Console**: nessun errore su index, lavoro, foto, celebrazioni, contattami.
+- Non verificato: Safari (il fix `isolation: isolate` è preventivo), Firefox,
+  dispositivi touch reali, un monitor fisico 1440x900.
+
 ## Deploy
 
 Il sito è **online su https://samuelecasabianca.com**.
@@ -736,6 +942,11 @@ passare al successivo).
     Serviva per il pannello "Contattami" finché non aveva foto reali; ora che ne
     ha tre in crossfade la classe è stata rimossa, ma il meccanismo resta
     disponibile per qualsiasi pannello debba restare fermo.
+  - **Meccanismo `panel--scroll`** (usato da "Il Mio Lavoro" in `index.html`):
+    al posto delle slide `panels.js` costruisce un collage delle foto di
+    `data-images` che scorre da solo (`buildMontage()`), senza crossfade e senza
+    listener di hover. Dettagli in "Social reali, pannelli smussati, collage a
+    scorrimento".
   - **Per usare foto reali nei pannelli**: aggiungere al pannello
     `data-images="assets/foto/categoria/a.jpg,assets/foto/categoria/b.jpg"` —
     il JS le usa come background al posto dei placeholder. Nessun'altra
@@ -772,7 +983,7 @@ passare al successivo).
   corrispondere alle rispettive `transition`/`animation` CSS).
 - **Transizione tra pagine a pannelli**: gestita da `initVerticalPanels()` in
   `js/panels.js`, quindi attiva automaticamente su tutte le pagine a pannelli
-  (index, lavoro, celebrazioni, eventi, sport). Stili nella sezione
+  (index, lavoro, foto, celebrazioni — eventi e sport sono diventate gallerie). Stili nella sezione
   `/* === Transizioni pannelli === */` di `css/style.css`. Due metà:
   - **Uscita**: al click su un pannello il JS fa `preventDefault()`, crea un
     clone visivo (`.panel-expander`, `position: fixed` sul rettangolo del
@@ -826,7 +1037,7 @@ passare al successivo).
     `.panel-note` ("Contenuti in arrivo"): la pagina è già funzionante, manca
     solo il contenuto video reale.
 - **Classi CSS principali**: `.panels`/`.panel`/`.panel-title`/`.panel-slides`/
-  `.panel-slide`, `.masonry`/`.masonry-item`, `.video-grid`/`.video-card`,
+  `.panel-slide`, `.panel-montage` (collage a scorrimento), `.social-links`/`.social-link`, `.masonry`/`.masonry-item`, `.video-grid`/`.video-card`,
   `.watch-layout`, `.chip`, `.ph` (placeholder foto generico), `.site-nav`,
   `.lightbox`, `.mobile-menu`, `.btn`.
 
@@ -852,8 +1063,10 @@ descritta lì prima di collegarle):
 
 **Altri**:
 - `contattami.html` — email reale (anche in `js/main.js`, funzione
-  `initContactForm`, indirizzo del `mailto:`), Instagram e LinkedIn reali
-  (ora `href="#"`)
+  `initContactForm`, indirizzo del `mailto:`). *Instagram e LinkedIn sono stati
+  inseriti*: `https://www.instagram.com/ph.samuele/?hl=it` e
+  `https://www.linkedin.com/in/samuele-casabianca-0387b7237/`, anche nella riga
+  social delle pagine a pannelli.
 
 ## Prossimi passi
 
@@ -861,7 +1074,7 @@ descritta lì prima di collegarle):
    stessa pipeline usata per le altre categorie (vedi "Immagini reali inserite").
 2. Ricevere i contenuti di Streaming e Video e sostituire `js/video-data.js` +
    collegare un player reale nelle pagine `*-watch.html`.
-3. Inserire email/social reali di Samuele.
+3. Inserire l'email reale di Samuele (i social sono già reali).
 4. Rifiniture su testi bio e descrizioni categorie (ora testi provvisori).
 5. Eventuale favicon e immagine Open Graph per la condivisione.
 6. Deploy (hosting statico: GitHub Pages, Netlify, ecc.) — fuori scope attuale.

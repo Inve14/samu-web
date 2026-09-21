@@ -17,7 +17,10 @@
       cursore esce il crossfade si ferma sulla slide corrente (nessun ritorno
       forzato alla prima). I pannelli con classe `panel--static` (es.
       Contattami) non hanno questo effetto: restano su un singolo placeholder
-      statico anche in hover.
+      statico anche in hover. I pannelli con classe `panel--scroll` (es. "Il
+      Mio Lavoro" in home) non fanno il crossfade: mostrano un collage delle
+      foto di data-images che scorre verso il basso in continuazione, anche
+      senza hover (animazione CSS su transform, vedi buildMontage()).
    2. Transizione di USCITA: al click il pannello si espande fino a coprire
       lo schermo, poi avviene la navigazione reale.
    3. Transizione di INGRESSO: al caricamento i pannelli si "aprono" con uno
@@ -66,6 +69,14 @@ function initVerticalPanels(options = {}) {
       .split(',')
       .map((s) => s.trim())
       .filter(Boolean);
+
+    // Pannelli a scorrimento: collage invece delle slide, niente crossfade
+    // né listener di hover. Senza foto non c'è collage da mostrare: ricade
+    // sul comportamento normale.
+    if (panel.classList.contains('panel--scroll') && images.length > 0) {
+      buildMontage(slidesWrap, images, reduceMotion);
+      return;
+    }
 
     const total = isStatic ? 1 : (images.length > 0 ? images.length : slideCount);
     if (total === 0) return;
@@ -151,6 +162,73 @@ function initVerticalPanels(options = {}) {
     resetExit();
     playEntry();
   });
+}
+
+/* ==========================================================================
+   Collage a scorrimento (pannelli `panel--scroll`).
+   Struttura: .panel-montage (traccia animata) > 2 x .panel-montage-group
+   identici > 2 x .panel-montage-col > .panel-montage-tile (foto come
+   background, stesso trattamento delle slide). Le foto si alternano fra le
+   due colonne; le altezze delle tessere seguono uno schema alto/basso
+   sfasato fra le colonne, così entrambe hanno la stessa altezza totale e il
+   gruppo non ha buchi in fondo. La traccia contiene due copie del gruppo e
+   l'animazione CSS la sposta da translateY(-50%) a 0: a fine ciclo mostra
+   esattamente ciò che mostrava all'inizio, quindi il loop non ha stacchi.
+   Con reduced motion la classe che avvia l'animazione non viene aggiunta:
+   il collage resta fermo.
+   ========================================================================== */
+function buildMontage(slidesWrap, images, reduceMotion) {
+  const track = document.createElement('div');
+  track.className = 'panel-montage';
+
+  for (let copy = 0; copy < 2; copy++) {
+    const group = document.createElement('div');
+    group.className = 'panel-montage-group';
+    const cols = [document.createElement('div'), document.createElement('div')];
+    cols.forEach((col) => {
+      col.className = 'panel-montage-col';
+      group.appendChild(col);
+    });
+
+    images.forEach((src, i) => {
+      const col = i % 2;
+      const row = Math.floor(i / 2);
+      const tile = document.createElement('div');
+      // Colonna sinistra: alta, bassa, alta... — destra: bassa, alta, bassa...
+      const tall = (row + col) % 2 === 0;
+      tile.className = 'panel-montage-tile' + (tall ? ' panel-montage-tile--tall' : '');
+      tile.style.backgroundImage = `url("${src}")`;
+      cols[col].appendChild(tile);
+    });
+
+    track.appendChild(group);
+  }
+
+  if (!reduceMotion) track.classList.add('is-running');
+  slidesWrap.appendChild(track);
+}
+
+/**
+ * Pannello a scorrimento: non ha una `.panel-slide.is-active` da copiare nel
+ * clone di uscita. Restituisce la tessera del collage più visibile in questo
+ * momento (maggiore area dentro il pannello), così il clone parte da una
+ * foto vera invece che da un rettangolo vuoto.
+ */
+function mostVisibleMontageTile(panel) {
+  const box = panel.getBoundingClientRect();
+  let best = null;
+  let bestArea = 0;
+  panel.querySelectorAll('.panel-montage-tile').forEach((tile) => {
+    const r = tile.getBoundingClientRect();
+    const w = Math.min(r.right, box.right) - Math.max(r.left, box.left);
+    const h = Math.min(r.bottom, box.bottom) - Math.max(r.top, box.top);
+    const area = w > 0 && h > 0 ? w * h : 0;
+    if (area > bestArea) {
+      bestArea = area;
+      best = tile;
+    }
+  });
+  return best;
 }
 
 /* ==========================================================================
@@ -260,8 +338,12 @@ function setupPanelsExit(container, panels) {
       const expander = document.createElement('div');
       expander.className = 'panel-expander';
 
-      // Slide attualmente visibile come istantanea per il clone visivo
-      const activeSlide = panel.querySelector('.panel-slides .panel-slide.is-active');
+      // Slide attualmente visibile come istantanea per il clone visivo. I
+      // pannelli a scorrimento non hanno slide: si usa la tessera del collage
+      // più visibile al momento del click.
+      const activeSlide =
+        panel.querySelector('.panel-slides .panel-slide.is-active') ||
+        (panel.classList.contains('panel--scroll') ? mostVisibleMontageTile(panel) : null);
       if (activeSlide) {
         expander.style.background = activeSlide.style.background;
         expander.style.backgroundImage = activeSlide.style.backgroundImage;
