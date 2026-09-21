@@ -71,6 +71,10 @@ Nessun build step, nessuna dipendenza (eccetto Google Fonts caricati via CDN):
 - [x] **Chi Sono in home**: a riposo `verona-3.jpg` (Samuele dietro le telecamere),
   inquadratura impostata foto per foto — vedi "Chi Sono: foto iniziale e
   inquadratura per foto"
+- [x] **Storie con riquadro sempre verticale** e pulsante schermo intero sui video
+  orizzontali — vedi "Riquadro verticale e schermo intero"
+- [x] **Contattami in home**: due immagini nuove (`assets/foto/contattami/`),
+  armonizzate con filtri CSS — vedi "Immagini del pannello Contattami"
 - [ ] **Video online**: i `.mp4` esistono solo in locale (esclusi dal repo), quindi
   **sul sito pubblicato le storie non funzionano** finché i video non vengono
   caricati su un hosting che serva file MP4 diretti — vedi "Deploy"
@@ -189,6 +193,7 @@ Mappatura cartella sorgente → cartella ottimizzata:
 | `PROGRAMMI TV/HOT ONES/` | `programmi-tv/` |
 | `SPORT/RUGBY/` | `sport-rugby/` |
 | `SC + LOGO/` (4 foto scelte per Chi Sono) | `chi-sono/` (`profilo.jpg`, `verona-1/2/3.jpg`) |
+| `contact me/` (2 immagini, fuori da `FOTO/`) | `contattami/` — vedi "Immagini del pannello Contattami" |
 
 **Se arrivano nuove foto**: rifare lo stesso procedimento (exif-transpose +
 thumbnail 1800px + JPEG q82 + nome ripulito) prima di metterle in `assets/foto/`
@@ -334,7 +339,9 @@ gli originali erano `-r--------`.
 - I template ripetuti nelle 4 pagine sono stati sostituiti da 3 helper condivisi
   in `js/main.js` (già incluso ovunque): `escapeHtml`, `videoThumbHtml`,
   `videoPlayerHtml`. `escapeHtml` serve davvero: "Matrimonio Claudia **&** Ivan"
-  dentro un `alt=""` rompeva il markup.
+  dentro un `alt=""` rompeva il markup. *(Poi rimossi tutti e tre con le pagine
+  video: le storie non costruiscono markup da stringhe, vedi "Codice rimasto
+  senza uso, rimosso".)*
 - I **video verticali** (9:16: tutti gli sport e Miu Miu) sono marcati con
   `verticale: true` nel dataset. In griglia restano interi dentro la card 16:9
   (`object-fit: contain` su fondo nero) invece di essere ritagliati fino a
@@ -726,7 +733,9 @@ forzando la cache prima dei test.
 Lavoro fatto sul branch locale `ristrutturazione-storie` (non su `main`, che
 resta com'era; niente push). Commit:
 `8234858` (lavoro dei passaggi precedenti: social, pannelli smussati, collage),
-`1371934` (struttura), `3c4b639` (storie), `04d9cf0` (Chi Sono).
+`1371934` (struttura), `3c4b639` (storie), `04d9cf0` (Chi Sono), `27d779c`
+(documentazione), poi `bf3584a` (riquadro verticale + schermo intero delle storie,
+immagini di Contattami) e il commit di documentazione che lo segue.
 
 > Le sezioni storiche più sopra ("Video reali: 22 file inseriti", "Sport: da
 > pannelli a galleria diretta", "Eventi: …", "Pannelli ridimensionati…")
@@ -761,6 +770,15 @@ index → lavoro (Foto | Streaming | Video)     index → lavoro (Programmi TV |
   `.filter-chips`), `.panel-note` (serviva solo al pannello Streaming),
   `.menu-sub2`, e gli helper `escapeHtml`/`videoThumbHtml`/`videoPlayerHtml` di
   `js/main.js`.
+  - **Perché anche `escapeHtml`** (decisione confermata con il committente):
+    serviva perché le vecchie pagine video costruivano l'HTML concatenando
+    stringhe, e un titolo come "Matrimonio Claudia & Ivan" dentro un `alt=""`
+    rompeva il markup. `js/stories.js` non lo fa: crea gli elementi via DOM e
+    scrive titoli ed `aria-label` con `textContent`/`setAttribute`, che non
+    interpretano `&` e virgolette come markup. Il caso resta coperto senza la
+    funzione (verificato: "Matrimonio Claudia & Ivan — 14 settembre 2024"
+    compare intero sotto la pallina di `celebrazioni-matrimoni.html`). Se in
+    futuro si costruirà markup da stringhe con dati del dataset, va reintrodotta.
 - `README.md` e il commento in `.gitignore` aggiornati (non parlano più di
   YouTube/embed).
 - **`js/panels.js` non ha richiesto modifiche per la ristrutturazione**:
@@ -791,11 +809,9 @@ Instagram. La galleria sotto è invariata (masonry + lightbox).
   successivo; dopo l'ultimo si chiude. ESC chiude, frecce navigano, Tab resta
   dentro il visore. Alla chiusura il video viene fermato e il download
   interrotto (`removeAttribute('src')` + `load()`), il focus torna alla pallina.
-- **Verticali / orizzontali** (campo `verticale` del dataset): il "palco" dei
-  verticali è alto quanto lo schermo e largo 9/16 (al massimo tutta la
-  larghezza), con il video in `cover` → su telefono riempie lo schermo come una
-  storia vera, su desktop è una colonna centrata. Gli orizzontali hanno il palco a
-  tutto schermo e il video in `contain`: interi, centrati, senza deformazioni.
+- **Verticali / orizzontali**: vedi "Riquadro verticale e schermo intero" qui
+  sotto (la prima versione dava agli orizzontali un palco a tutto schermo: è stata
+  sostituita).
 - **Nessun conflitto col lightbox**: con una storia aperta tutti gli altri figli
   di `<body>` sono `inert` e lo scroll è bloccato; il lightbox reagisce solo a
   click su `.masonry-item` e alla tastiera quando è aperto, quindi non può aprirsi
@@ -871,6 +887,102 @@ video viene ignorato). Misure a 1440x900 e 375x800 in iframe di quelle dimension
   caricamento dei video; la stessa logica con un `ended` vero è verificata senza
   reduced motion); nessun test su Safari/Firefox o su telefono reale; le storie
   online (i video non sono pubblicati).
+
+### Riquadro verticale e schermo intero
+
+- **Il riquadro della storia è sempre verticale**, su telefono, tablet e
+  desktop: alto quanto lo schermo, largo 9/16 (al massimo tutta la larghezza) →
+  375x800 su un telefono (schermo pieno), 506x900 centrato a 1440x900.
+- **Verticali** (`verticale: true`): il video riempie il riquadro (`cover`).
+  **Orizzontali**: il video sta intero e centrato (`contain`) con le fasce scure
+  sopra e sotto — mai tagliato per riempire.
+- **Pulsante schermo intero** (`.story-fullscreen`, icona di espansione in basso
+  a destra del riquadro), **solo sugli orizzontali** e solo se il browser offre
+  almeno uno dei metodi sotto. `enterFullscreen()` prova, in ordine:
+  `video.requestFullscreen()` (API standard), `video.webkitRequestFullscreen()`
+  (Safari desktop meno recente), `video.webkitEnterFullscreen()` (Safari iOS, dove
+  la Fullscreen API su un elemento qualsiasi non esiste: apre il player nativo).
+  Lo stato è seguito sia con `fullscreenchange`/`webkitfullscreenchange` sia con
+  gli eventi del player iOS `webkitbeginfullscreen`/`webkitendfullscreen`.
+- **A schermo intero**: il `<video>` mostra i comandi nativi (`controls` acceso
+  solo in quel momento); zone di tocco, frecce ed ESC delle storie non reagiscono
+  (ESC è del browser ed esce dallo schermo intero, non chiude le storie); la fine
+  del video non fa partire la storia successiva.
+- **All'uscita**: comandi nativi spenti, riproduzione ripresa dal punto in cui si
+  era (nessuno tocca `currentTime`), focus sul pulsante. Se il video è finito
+  mentre era a schermo intero, si resta su quella storia, ferma alla fine: si
+  prosegue con un tocco. Chiudendo le storie mentre si è a schermo intero, prima
+  si esce dallo schermo intero.
+
+### Immagini del pannello Contattami
+
+Due immagini nuove arrivate in `immagini/PORTFOLIO/contact me/`, aggiunte al
+pannello Contattami della home **accanto** alle tre foto già presenti (il
+crossfade ora ne ha cinque, alternate: foto evento → reflex → mani → icone →
+brindisi; a riposo resta la foto dell'evento).
+
+| Sorgente | Ottimizzata | Dimensioni | Peso |
+|---|---|---|---|
+| `27ea25b6-e29c-4706-a847-8963692778ee.jpg` (render 3D di icone di contatto) | `assets/foto/contattami/27ea25b6-e29c-4706-a847-8963692778ee.jpg` | 1024x860 (già sotto i 1800px: non ingrandita) | 40 KB |
+| `theregisti-HSXIp58yPyI-unsplash.jpg` (due reflex, 6000x4000, 5,5 MB) | `assets/foto/contattami/theregisti-HSXIp58yPyI-unsplash.jpg` | 1800x1200 | 189 KB |
+
+- **Pipeline**: la stessa di tutte le altre foto (`ImageOps.exif_transpose` →
+  `thumbnail` 1800px sul lato lungo, Lanczos → JPEG qualità 82 → nome ripulito da
+  spazi e caratteri speciali). I due nomi non ne contenevano, quindi sono rimasti
+  uguali (maiuscole comprese, come per le altre foto). Il sito referenzia solo
+  `assets/`: nessuna pagina cita `immagini/` fuori dai commenti (verificato).
+- **Nota sui toni reali**: solo il render di icone è chiaro (fondo grigio-azzurro
+  chiarissimo, icone blu). La foto delle reflex è già scura, ma in luce al neon
+  magenta/viola molto satura: fredda e fuori palette, non chiara.
+- **Armonizzazione, solo CSS (i file non sono modificati)**, con regole
+  `.panel-slide[data-src$="…"]` in `css/style.css`:
+  - icone: `invert(1) sepia(0.2) saturate(1.3) brightness(0.9) contrast(1.2)`.
+    L'inversione porta il fondo quasi al nero del sito e il blu delle icone al
+    suo complementare, un crema/rame caldo vicino a `--color-accent`; seppia e
+    contrasto lo scaldano e lo staccano dal fondo. Scelta fra diverse prove
+    (seppia scura, oro scuro: davano un oliva spento);
+  - reflex: `grayscale(1) sepia(0.8) brightness(1.35) contrast(1.1)` —
+    monocromatica calda, niente magenta; schiarita perché sotto la velatura del
+    pannello la foto, già scura, sparirebbe nel nero. Inquadratura `20% center`,
+    sulla reflex di sinistra (obiettivo e logo), altrimenti il pannello stretto
+    mostrerebbe lo spazio fra le due fotocamere.
+  - Sopra resta la velatura scura comune a tutti i pannelli.
+- **Supporto in `js/panels.js`**: ogni slide con foto riceve `data-src` (il
+  percorso), a cui il CSS aggancia il filtro; il clone dell'animazione di uscita
+  ora porta lo sfondo in un livello interno `.panel-expander-bg` che copia
+  immagine, inquadratura e filtro della slide. Il filtro sul clone intero avrebbe
+  alterato anche titolo e velatura.
+- La foto delle reflex viene da Unsplash (licenza Unsplash: uso libero, anche
+  commerciale, senza obbligo di attribuzione).
+
+### Verifiche fatte in browser per questi due punti (Chrome)
+
+- **Contattami**, guardato a 1440x900 e 375x800 accanto agli altri pannelli con
+  ciascuna immagine nuova attiva: nessun rettangolo chiaro, toni scuri e caldi
+  come Chi Sono e Il Mio Lavoro. Clone di uscita con le icone attive: filtro sul
+  livello di sfondo, titolo bianco e velatura invariati.
+- **Riquadro**: `sport.html` (verticale) 506x900 a 1440x900 e 375x800 a 375x800,
+  `cover`, pulsante nascosto; `eventi.html` "Video Evento 1" (orizzontale,
+  1920x1080) stesse dimensioni, `contain`, pulsante visibile. Guardato: il video
+  orizzontale sta intero al centro con le fasce sopra e sotto.
+- **Schermo intero**: click reale sul pulsante → il click arriva e il codice
+  chiama `video.requestFullscreen()`, ma **Chrome ha rifiutato la richiesta
+  ("not granted") perché la finestra di test risultava nascosta**
+  (`visibilityState: hidden`, anche i video lì non partivano: si vedeva il
+  poster). Il rifiuto è gestito e non produce errori. **Lo schermo intero vero,
+  e il ritorno al punto giusto con un video che avanza davvero, non sono stati
+  verificati**: va fatta una prova a mano (desktop e iPhone). Verificata invece
+  la logica di stato, comune ai due percorsi, con gli eventi del player iOS
+  simulati: a schermo intero comandi nativi attivi, tap destra/sinistra, frecce,
+  ESC e fine video non cambiano storia né chiudono il visore; all'uscita comandi
+  spenti, riproduzione ripresa, focus sul pulsante, tap di nuovo attivi.
+- **Regressione storie** (`sport.html`): 15 palline, 0 `<video>` e 0 richieste
+  `.mp4` all'apertura, apertura, tap e frecce, avanzamento a fine video, chiusura
+  dopo l'ultimo, X, ESC, scroll bloccato/ripristinato, lightbox funzionante a
+  storie chiuse.
+- **Link**: 263 riferimenti locali unici (pagine, menu, 22 video e poster del
+  dataset) controllati via HTTP, nessuno rotto. **Console**: nessun messaggio
+  sulle 10 pagine.
 
 ## Deploy
 
