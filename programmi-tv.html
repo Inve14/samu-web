@@ -32,6 +32,12 @@
       <p>Backstage e riprese per la televisione: studi, set e dietro le quinte.</p>
     </div>
 
+    <!-- Storie video (js/stories.js): una pallina per ogni video di VIDEO_DATA
+         con categoria "programmi-tv", click per guardarle a schermo intero. Nessun video
+         disponibile per questa categoria: stories.js mostra il segnaposto "Video in
+         arrivo". -->
+    <section class="stories" data-categoria="programmi-tv" aria-label="Video — Programmi TV"></section>
+
     <!-- Galleria masonry: click su una foto per aprire il lightbox -->
     <div class="masonry">
       <figure class="masonry-item" tabindex="0">
@@ -93,6 +99,8 @@
     <span>Samuele Casabianca — Fotografo, Videomaker e Regista</span>
   </footer>
 
+  <script src="js/video-data.js"></script>
+  <script src="js/stories.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>
