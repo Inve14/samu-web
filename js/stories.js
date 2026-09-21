@@ -20,6 +20,16 @@
    - mentre è aperto lo scroll è bloccato e il resto della pagina è `inert`
      (nessun click o focus arriva alla galleria, quindi il lightbox non può
      aprirsi sotto una storia).
+   Riquadro sempre verticale (9:16) su ogni dispositivo: i video verticali lo
+   riempiono, quelli orizzontali stanno interi e centrati con le fasce sopra e
+   sotto (mai tagliati). Solo sugli orizzontali compare un pulsante per lo
+   schermo intero, scelto dall'utente: API Fullscreen standard sul <video>
+   (requestFullscreen, o webkitRequestFullscreen su Safari desktop meno
+   recente), con fallback a webkitEnterFullscreen() — il player nativo di
+   Safari iOS, dove requestFullscreen su un elemento non esiste. Mentre si è a
+   schermo intero zone di tocco e frecce non reagiscono (i comandi sono quelli
+   nativi del player) e la storia non passa alla successiva: uscendo si
+   riprende dallo stesso punto.
    Con prefers-reduced-motion: reduce il video aperto parte comunque (è
    un'azione esplicita dell'utente) ma a fine video non si passa da soli al
    successivo: si naviga solo a mano.
@@ -70,8 +80,9 @@ function initStories() {
 
   /* ---------- Visore (creato al primo uso) ---------- */
   let viewer = null;
-  let stage, video, bars, titleEl, closeBtn;
+  let stage, video, bars, titleEl, closeBtn, fullscreenBtn;
   let current = 0;
+  let fullscreen = false; // true mentre il video è a schermo intero
   let opener = null;
   let rafId = null;
   let inertEls = [];
@@ -89,6 +100,11 @@ function initStories() {
           <div class="story-bars">${videos.map(() => '<span class="story-bar"><span class="story-bar-fill"></span></span>').join('')}</div>
           <p class="story-caption"></p>
         </div>
+        <button type="button" class="story-fullscreen" aria-label="Guarda a schermo intero" hidden>
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+            <path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/>
+          </svg>
+        </button>
       </div>
       <button type="button" class="story-tap story-tap--prev" aria-label="Video precedente"></button>
       <button type="button" class="story-tap story-tap--next" aria-label="Video successivo"></button>
@@ -101,20 +117,32 @@ function initStories() {
     bars = Array.from(viewer.querySelectorAll('.story-bar-fill'));
     titleEl = viewer.querySelector('.story-caption');
     closeBtn = viewer.querySelector('.story-close');
+    fullscreenBtn = viewer.querySelector('.story-fullscreen');
 
-    viewer.querySelector('.story-tap--prev').addEventListener('click', prev);
-    viewer.querySelector('.story-tap--next').addEventListener('click', next);
+    // Zone di tocco inattive a schermo intero (i comandi sono quelli nativi)
+    viewer.querySelector('.story-tap--prev').addEventListener('click', () => { if (!fullscreen) prev(); });
+    viewer.querySelector('.story-tap--next').addEventListener('click', () => { if (!fullscreen) next(); });
     closeBtn.addEventListener('click', close);
+    fullscreenBtn.addEventListener('click', enterFullscreen);
 
     video.addEventListener('ended', () => {
       setBar(current, 1);
-      if (!reduceMotion) next();
+      // A schermo intero non si passa alla storia successiva: uscendo
+      // l'utente ritrova quella che stava guardando
+      if (!reduceMotion && !fullscreen) next();
     });
+
+    // Uscita dallo schermo intero: API standard (anche con prefisso webkit)
+    // e player nativo di iOS hanno eventi diversi
+    document.addEventListener('fullscreenchange', onFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', onFullscreenChange);
+    video.addEventListener('webkitbeginfullscreen', () => setFullscreen(true));
+    video.addEventListener('webkitendfullscreen', () => setFullscreen(false));
 
     // Focus intrappolato nel visore: Tab gira solo fra i suoi pulsanti
     viewer.addEventListener('keydown', (e) => {
       if (e.key !== 'Tab') return;
-      const focusables = Array.from(viewer.querySelectorAll('button'));
+      const focusables = Array.from(viewer.querySelectorAll('button:not([hidden])'));
       const first = focusables[0];
       const last = focusables[focusables.length - 1];
       if (e.shiftKey && document.activeElement === first) {
@@ -125,6 +153,50 @@ function initStories() {
         first.focus();
       }
     });
+  }
+
+  /* ---------- Schermo intero (solo video orizzontali) ---------- */
+  function enterFullscreen() {
+    if (video.requestFullscreen) {
+      video.requestFullscreen().catch(() => {});
+    } else if (video.webkitRequestFullscreen) {
+      video.webkitRequestFullscreen();
+    } else if (video.webkitEnterFullscreen) {
+      // Safari iOS: apre il player nativo (gli eventi webkitbegin/endfullscreen
+      // aggiornano lo stato)
+      video.webkitEnterFullscreen();
+    }
+  }
+
+  function exitFullscreen() {
+    const el = document.fullscreenElement || document.webkitFullscreenElement;
+    if (el) {
+      (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+    } else if (video.webkitDisplayingFullscreen && video.webkitExitFullscreen) {
+      video.webkitExitFullscreen();
+    }
+  }
+
+  function onFullscreenChange() {
+    const el = document.fullscreenElement || document.webkitFullscreenElement;
+    setFullscreen(el === video);
+  }
+
+  function setFullscreen(on) {
+    if (on === fullscreen) return;
+    fullscreen = on;
+    // Comandi nativi (play/pausa, timeline) solo a schermo intero
+    video.controls = on;
+    if (!on) {
+      // Si riprende dal punto in cui si era; se il video è finito mentre era
+      // a schermo intero resta sulla stessa storia, ferma alla fine
+      if (!video.ended) video.play().catch(() => {});
+      fullscreenBtn.focus();
+    }
+  }
+
+  function supportsFullscreen() {
+    return !!(video.requestFullscreen || video.webkitRequestFullscreen || video.webkitEnterFullscreen);
   }
 
   function isOpen() {
@@ -148,6 +220,7 @@ function initStories() {
     bars.forEach((_, j) => setBar(j, j < i ? 1 : 0));
     titleEl.textContent = v.titolo;
     stage.classList.toggle('is-vertical', !!v.verticale);
+    fullscreenBtn.hidden = !!v.verticale || !supportsFullscreen();
     video.poster = v.poster || '';
     video.src = v.src;
     // Apertura = gesto dell'utente, quindi l'audio è consentito; se il
@@ -178,6 +251,10 @@ function initStories() {
 
   function close() {
     if (!isOpen()) return;
+    if (fullscreen) {
+      exitFullscreen();
+      setFullscreen(false);
+    }
     viewer.classList.remove('is-open');
     cancelAnimationFrame(rafId);
     rafId = null;
@@ -209,7 +286,9 @@ function initStories() {
   }
 
   document.addEventListener('keydown', (e) => {
-    if (!isOpen()) return;
+    // A schermo intero ESC e frecce sono del player (ESC esce dallo schermo
+    // intero, non chiude le storie)
+    if (!isOpen() || fullscreen) return;
     if (e.key === 'Escape') close();
     else if (e.key === 'ArrowRight') next();
     else if (e.key === 'ArrowLeft') prev();

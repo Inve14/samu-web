@@ -101,6 +101,9 @@ function initVerticalPanels(options = {}) {
         // indicata in data-images)
         slide.style.backgroundImage = `url("${images[i]}")`;
         if (entries[i].position) slide.style.backgroundPosition = entries[i].position;
+        // Percorso della foto come attributo: permette al CSS di trattare
+        // una singola foto (es. i filtri delle immagini di Contattami)
+        slide.dataset.src = images[i];
       } else {
         // Placeholder: tonalità di grigio leggermente diverse
         slide.classList.add('ph');
@@ -356,14 +359,22 @@ function setupPanelsExit(container, panels) {
       const activeSlide =
         panel.querySelector('.panel-slides .panel-slide.is-active') ||
         (panel.classList.contains('panel--scroll') ? mostVisibleMontageTile(panel) : null);
+      // Lo sfondo sta in un livello interno (.panel-expander-bg), non sul clone
+      // stesso: così un eventuale filtro CSS della slide (es. le immagini di
+      // Contattami) si copia sull'immagine senza alterare titolo e velatura.
       if (activeSlide) {
-        expander.style.background = activeSlide.style.background;
-        expander.style.backgroundImage = activeSlide.style.backgroundImage;
+        const bg = document.createElement('div');
+        bg.className = 'panel-expander-bg';
+        bg.style.background = activeSlide.style.background;
+        bg.style.backgroundImage = activeSlide.style.backgroundImage;
         // Stessa inquadratura della slide (se ne ha una propria), così il
         // clone parte identico al pannello
         if (activeSlide.style.backgroundPosition) {
-          expander.style.backgroundPosition = activeSlide.style.backgroundPosition;
+          bg.style.backgroundPosition = activeSlide.style.backgroundPosition;
         }
+        const filter = getComputedStyle(activeSlide).filter;
+        if (filter && filter !== 'none') bg.style.filter = filter;
+        expander.appendChild(bg);
       }
 
       const title = panel.querySelector('.panel-title');
