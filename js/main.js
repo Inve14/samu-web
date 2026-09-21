@@ -163,8 +163,10 @@ function escapeHtml(text) {
 /* Miniatura di una card: fotogramma reale se disponibile, altrimenti il
    riquadro tratteggiato di prima. `loading="lazy"` come nelle gallerie. */
 function videoThumbHtml(v, baseClass = 'video-thumb') {
-  if (!v.poster) return `<div class="${baseClass}">Video...</div>`;
+  // `is-vertical` dà al riquadro la proporzione 9:16 (anche al segnaposto),
+  // da cui nasce il mosaico irregolare delle griglie
   const vertical = v.verticale ? ' is-vertical' : '';
+  if (!v.poster) return `<div class="${baseClass}${vertical}">Video...</div>`;
   return `
     <div class="${baseClass} ${baseClass}--real${vertical}">
       <img src="${escapeHtml(v.poster)}" alt="${escapeHtml(v.titolo)}" loading="lazy">

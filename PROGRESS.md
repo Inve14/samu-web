@@ -357,7 +357,8 @@ gli originali erano `-r--------`.
 - I **video verticali** (9:16: tutti gli sport e Miu Miu) sono marcati con
   `verticale: true` nel dataset. In griglia restano interi dentro la card 16:9
   (`object-fit: contain` su fondo nero) invece di essere ritagliati fino a
-  mostrare solo una striscia centrale; nel player il riquadro passa a 9:16
+  mostrare solo una striscia centrale *(superato: oggi in griglia hanno un
+  riquadro 9:16 proprio, vedi "Mosaico anche su telefono, per foto e video")*; nel player il riquadro passa a 9:16
   centrato, con tetto in `vh` per non superare l'altezza della finestra.
 
 ### Streaming: ancora fermo, e perché
@@ -1141,6 +1142,74 @@ storie.
 - **Non verificato**: la riproduzione vera in `video-watch.html` oltre ai
   metadati (non è cambiata rispetto a `a3d555d`), Safari/Firefox, telefoni reali.
 
+## Mosaico anche su telefono, per foto e video
+
+Difetto corretto: su schermi piccoli il sito perdeva l'impaginazione irregolare
+e diventava un elenco (gallerie a una colonna, griglie video di riquadri 16:9
+tutti uguali). Principio: l'impaginazione resta riconoscibilmente la stessa dal
+telefono al computer, cambia la densità (numero di colonne), non il carattere.
+
+### Gallerie fotografiche (`.masonry`)
+
+- Tolta la regola che sotto i 560px portava la masonry a **una colonna**: resta
+  a 2 colonne (3 sopra i 900px). Sotto i 560px si stringono solo gli spazi
+  (`column-gap` e `margin-bottom` a `--space-xs`), per lasciare più larghezza
+  alle foto: a 375px ogni colonna è larga 168px.
+- Toccabilità: la foto più piccola misura 112px sul lato corto (soglia comoda
+  per il dito ~44px); il lightbox si apre al tocco, prev/next e chiudi sono
+  pulsanti da 43–52 x 64px. Il lightbox non è stato modificato.
+
+### Griglie video (`video.html`, `streaming.html`)
+
+- `.video-grid` passa da griglia uniforme (`grid`, card 16:9 identiche) a
+  **mosaico a colonne come le gallerie** (`columns`, card con
+  `break-inside: avoid`): 4 colonne, 3 sotto i 1100px, 2 sotto i 560px.
+- **L'irregolarità viene dal contenuto, non da una casualità decorativa**: il
+  riquadro di ogni miniatura ha la proporzione del suo video, dal campo
+  `verticale` del dataset. `videoThumbHtml()` (in `js/main.js`) aggiunge
+  `is-vertical` → `.video-thumb.is-vertical { aspect-ratio: 9 / 16 }`,
+  altrimenti 16:9. Vale anche per i segnaposto senza poster.
+- **Niente più fasce nere**: i poster hanno esattamente la proporzione del video
+  (verificato: 720x1280 i 16 verticali, 1280x720 i 6 orizzontali), quindi in un
+  riquadro della stessa proporzione riempiono la card (`cover`) senza fasce e
+  senza tagli. Il vecchio `contain` sui verticali resta solo per i correlati
+  della pagina di riproduzione, i cui riquadri sono sempre 16:9.
+- **Filtri** di `video.html`: le card escluse ora escono dal mosaico
+  (`display: none`) invece di restare trasparenti, che avrebbe lasciato buchi.
+- Ordine di lettura: come nella masonry delle gallerie, le card riempiono le
+  colonne dall'alto in basso (prima colonna, poi la seconda…), non per righe.
+- **Streaming resta uniforme**: le 10 voci di `STREAM_DATA` sono segnaposto
+  senza `verticale` né poster, quindi sono tutte 16:9. Non è stata data loro una
+  forma a caso; il meccanismo è lo stesso di `video.html`, quindi quando
+  arriveranno contenuti reali con `verticale` il mosaico comparirà da solo.
+
+### Pannello Streaming di `lavoro.html`
+
+Tolta la scritta "Foto 1" in basso: veniva da `js/panels.js`, che etichettava
+"Foto N" le slide segnaposto dei pannelli senza `data-images` (oggi solo
+Streaming, che ha già la sua nota "Contenuti in arrivo"). Le slide segnaposto
+non hanno più etichetta; resta il bordo tratteggiato.
+
+### Verifiche fatte in browser (Chrome, `python3 -m http.server 8000`, misure in iframe)
+
+- **Gallerie**, tutte e 5: 3 colonne a 1440x900, **2 colonne a 375x800**
+  (larghe 168px), con 2–4 proporzioni diverse per galleria (non una fila di foto
+  uguali); guardato `sport.html` a 375: mosaico irregolare a 2 colonne.
+  Lightbox a 375: apertura al tocco, avanti, chiusura.
+- **`video.html`**: 22 card → 16 riquadri alti 9:16 e 6 larghi 16:9, 4 colonne a
+  1440, 3 a 1024, 2 a 375; **0 miniature con fasce o tagli** (proporzione del
+  poster = proporzione del riquadro, `cover`); guardato a 375 e a 1440. Filtri:
+  Tutti 22 / Eventi 6 / Matrimoni 1 / Sport 15, nessuna card fuori categoria, la
+  griglia si compatta (es. da 3149 a 604px di altezza con "Eventi").
+- **`streaming.html`**: 10 card 16:9 (vedi sopra), 4/3/2 colonne.
+- Correlati di `video-watch.html`: verticali ancora interi (`contain`).
+- Pannello Streaming: 5 slide segnaposto, nessun testo, nota "Contenuti in
+  arrivo" intatta.
+- Nessuno scroll orizzontale (1440, 1024, 375); nessun errore in console su home,
+  lavoro, video, streaming, pagine di riproduzione e le 5 gallerie.
+- **Non verificato**: telefoni reali (tocco vero su schermo touch), Safari e
+  Firefox.
+
 ## Deploy
 
 Il sito è **online su https://samuelecasabianca.com**.
@@ -1388,7 +1457,8 @@ passare al successivo).
     modifica necessaria. Già fatto per la maggior parte dei pannelli, vedi
     "Immagini reali inserite" per l'elenco completo e per la pipeline di
     ottimizzazione da seguire con le foto nuove.
-- **Galleria**: masonry con CSS `columns` (niente JS per il layout). Le
+- **Galleria**: masonry con CSS `columns` (niente JS per il layout): 3 colonne,
+  2 sotto i 900px e **mai una sola** (vedi "Mosaico anche su telefono"). Le
   proporzioni dei placeholder variano tramite classi `ph--tall`, `ph--wide`,
   `ph--square`, `ph--panorama` per simulare il ritmo masonry.
 - **Lightbox**: markup iniettato da `js/main.js`; prev/next, ESC, frecce
@@ -1443,8 +1513,9 @@ passare al successivo).
     genitore.
 - **Sezioni Streaming e Video** (`streaming.html`, `video.html` +
   `streaming-watch.html`, `video-watch.html`): non usano il componente
-  pannelli, ma una griglia in stile piattaforma video (`.video-grid` /
-  `.video-card`, card 16:9 con titolo/canale/durata placeholder sotto).
+  pannelli, ma un mosaico a colonne di card (`.video-grid` / `.video-card`),
+  con riquadro 9:16 o 16:9 secondo il campo `verticale` e titolo/canale/durata
+  sotto (vedi "Mosaico anche su telefono, per foto e video").
   - **Dataset condiviso**: `js/video-data.js` espone due array globali,
     `STREAM_DATA` e `VIDEO_DATA` (oggetti `{ id, titolo, categoria, canale,
     durata, descrizione }`, `categoria` solo sui video). Le quattro pagine lo
@@ -1456,9 +1527,10 @@ passare al successivo).
     href="…-watch.html?v=ID(&cat=CATEGORIA)">`. In `video.html` le card hanno
     anche `data-categoria`.
   - **Filtro categoria** (solo `video.html`): chip `.chip` (Tutti / Eventi /
-    Matrimoni / Sport); al click aggiunge `.is-filtered-out` (`opacity: 0;
-    pointer-events: none`) alle card non corrispondenti — filtro client-side,
-    nessuna ricarica pagina, nessun layout reflow oltre alla dissolvenza.
+    Matrimoni / Sport); al click aggiunge `.is-filtered-out` alle card non
+    corrispondenti — filtro client-side, nessuna ricarica pagina. Con il mosaico
+    la classe è `display: none` (prima era una dissolvenza a `opacity: 0`, che
+    in un layout a colonne lascerebbe buchi alti quanto un video verticale).
   - **Pagine di riproduzione** (`streaming-watch.html`/`video-watch.html`):
     layout a due colonne `.watch-layout` (player + info a sinistra, correlati
     `.watch-related-list` a destra; a una colonna sotto i 900px). Leggono

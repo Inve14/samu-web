@@ -422,14 +422,12 @@ button {
   height: calc(var(--montage-unit) * 2 + var(--montage-gap));
 }
 
-/* Variante placeholder della slide: bordo tratteggiato + etichetta "Foto N".
-   L'etichetta sta in basso per non sovrapporsi al titolo del pannello. */
+/* Variante placeholder della slide (pannelli senza foto, oggi solo Streaming):
+   solo il bordo tratteggiato, nessuna etichetta. */
 .panel-slide.ph {
   border: none;
   outline: 1px dashed var(--color-border-dash);
   outline-offset: -14px;
-  align-items: flex-end;
-  padding-bottom: 2.2rem;
 }
 
 /* Overlay scuro sopra le slide, si alleggerisce in hover */
@@ -757,21 +755,27 @@ button {
   border-color: var(--color-accent);
 }
 
-/* Griglia di card (streaming.html, video.html) */
+/* Griglia di card (streaming.html, video.html): mosaico a colonne come la
+   masonry delle gallerie, non una griglia uniforme. L'irregolarità viene
+   dalla forma vera del contenuto: ogni miniatura ha la proporzione del suo
+   video (campo `verticale` del dataset → 9:16, altrimenti 16:9). Stesso
+   carattere dal telefono al computer, cambia solo il numero di colonne
+   (4 → 3 → 2, vedi "Responsive"). */
 .video-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: var(--space-md);
+  columns: 4;
+  column-gap: var(--space-md);
 }
 
 .video-card {
   display: block;
-  transition: opacity var(--transition-fast);
+  break-inside: avoid;
+  margin-bottom: var(--space-md);
 }
 
+/* Filtro categoria: la card esce dal mosaico (non resta un buco trasparente,
+   che in un layout a colonne lascerebbe vuoti alti quanto un video verticale) */
 .video-card.is-filtered-out {
-  opacity: 0;
-  pointer-events: none;
+  display: none;
 }
 
 .video-thumb {
@@ -792,14 +796,19 @@ button {
   transition: transform var(--transition-fast);
 }
 
+/* Video verticale: riquadro alto e stretto, della stessa proporzione del video */
+.video-thumb.is-vertical {
+  aspect-ratio: 9 / 16;
+}
+
 .video-card:hover .video-thumb {
   transform: scale(1.02);
 }
 
 /* Miniatura con fotogramma reale: via il riquadro tratteggiato del segnaposto.
-   I video orizzontali riempiono la card (cover), quelli verticali (9:16)
-   restano interi dentro la card 16:9 (contain su fondo nero) invece di
-   essere ritagliati fino a mostrare solo una striscia centrale. */
+   Nelle griglie il riquadro ha già la proporzione del video, quindi il poster
+   lo riempie (cover) senza fasce né tagli. Solo nei correlati della pagina di
+   riproduzione (riquadri sempre 16:9) i verticali restano interi (contain). */
 .video-thumb--real,
 .watch-related-thumb--real {
   background: #000;
@@ -816,7 +825,6 @@ button {
   display: block;
 }
 
-.video-thumb--real.is-vertical img,
 .watch-related-thumb--real.is-vertical img {
   object-fit: contain;
 }
@@ -1423,6 +1431,12 @@ button {
 /* ==========================================================================
    Responsive
    ========================================================================== */
+@media (max-width: 1100px) {
+  .video-grid {
+    columns: 3;
+  }
+}
+
 @media (max-width: 900px) {
   .masonry {
     columns: 2;
@@ -1508,9 +1522,33 @@ button {
   }
 }
 
+/* Telefono: niente colonna unica. Gallerie e griglie video restano a 2
+   colonne, così il mosaico irregolare sopravvive; si stringono solo gli spazi
+   per lasciare più larghezza alle immagini. */
 @media (max-width: 560px) {
   .masonry {
-    columns: 1;
+    column-gap: var(--space-xs);
+  }
+
+  .masonry-item {
+    margin-bottom: var(--space-xs);
+  }
+
+  .video-grid {
+    columns: 2;
+    column-gap: var(--space-sm);
+  }
+
+  .video-card {
+    margin-bottom: var(--space-sm);
+  }
+
+  .video-title {
+    font-size: 0.85rem;
+  }
+
+  .video-meta {
+    font-size: 0.72rem;
   }
 }
 

@@ -105,10 +105,11 @@ function initVerticalPanels(options = {}) {
         // una singola foto (es. i filtri delle immagini di Contattami)
         slide.dataset.src = images[i];
       } else {
-        // Placeholder: tonalità di grigio leggermente diverse
+        // Placeholder: tonalità di grigio leggermente diverse, senza
+        // etichetta (l'unico pannello senza foto è Streaming, che ha già la
+        // sua nota "Contenuti in arrivo": una scritta "Foto N" lì era fuori posto)
         slide.classList.add('ph');
         slide.style.background = `hsl(240 5% ${9 + i * 4}%)`;
-        slide.textContent = `Foto ${i + 1}`;
       }
 
       slidesWrap.appendChild(slide);
