@@ -65,10 +65,20 @@ function initVerticalPanels(options = {}) {
     // Foto reali: l'attributo data-images="percorso1.jpg,percorso2.jpg,..."
     // sul pannello sostituisce i placeholder generati. Su un pannello statico
     // viene usata solo la prima. Senza l'attributo restano i placeholder grigi.
-    const images = (panel.dataset.images || '')
+    // Ogni voce può avere dopo il percorso (separata da spazio) la propria
+    // inquadratura, con la sintassi di background-position — es.
+    // "assets/foto/x.jpg 25% center": serve quando nello stesso pannello ci
+    // sono foto orizzontali e verticali con il soggetto in punti diversi
+    // (vedi il pannello Chi Sono in index.html). Senza, resta centrata.
+    const entries = (panel.dataset.images || '')
       .split(',')
       .map((s) => s.trim())
-      .filter(Boolean);
+      .filter(Boolean)
+      .map((entry) => {
+        const [src, ...position] = entry.split(/\s+/);
+        return { src, position: position.join(' ') };
+      });
+    const images = entries.map((e) => e.src);
 
     // Pannelli a scorrimento: collage invece delle slide, niente crossfade
     // né listener di hover. Senza foto non c'è collage da mostrare: ricade
@@ -87,8 +97,10 @@ function initVerticalPanels(options = {}) {
       slide.className = 'panel-slide';
 
       if (images.length > 0) {
-        // Foto reale come background (cover, centrata)
+        // Foto reale come background (cover, centrata o con l'inquadratura
+        // indicata in data-images)
         slide.style.backgroundImage = `url("${images[i]}")`;
+        if (entries[i].position) slide.style.backgroundPosition = entries[i].position;
       } else {
         // Placeholder: tonalità di grigio leggermente diverse
         slide.classList.add('ph');
@@ -347,6 +359,11 @@ function setupPanelsExit(container, panels) {
       if (activeSlide) {
         expander.style.background = activeSlide.style.background;
         expander.style.backgroundImage = activeSlide.style.backgroundImage;
+        // Stessa inquadratura della slide (se ne ha una propria), così il
+        // clone parte identico al pannello
+        if (activeSlide.style.backgroundPosition) {
+          expander.style.backgroundPosition = activeSlide.style.backgroundPosition;
+        }
       }
 
       const title = panel.querySelector('.panel-title');

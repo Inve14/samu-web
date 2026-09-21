@@ -44,7 +44,15 @@
 
   <!-- Pannelli verticali della landing -->
   <main class="panels panels--landing">
-    <a class="panel" href="chi-sono.html" data-images="assets/foto/chi-sono/profilo.jpg,assets/foto/chi-sono/verona-1.jpg,assets/foto/chi-sono/verona-2.jpg,assets/foto/chi-sono/verona-3.jpg">
+    <!-- Prima foto = quella a riposo: Samuele dietro le telecamere (verona-3).
+         Ogni foto ha la sua inquadratura (percorso + background-position): le
+         tre orizzontali hanno il viso nel terzo sinistro e vanno spostate a
+         sinistra, altrimenti il pannello stretto mostra solo i cavalletti
+         (in verona-1/2 il viso è all'altezza del titolo, quindi viene tenuto
+         alla sua sinistra invece che sotto la scritta); il
+         ritratto verticale va ancorato in alto, altrimenti quando il pannello
+         si allarga (o su mobile) il ritaglio taglia la testa. -->
+    <a class="panel" href="chi-sono.html" data-images="assets/foto/chi-sono/verona-3.jpg 25% center,assets/foto/chi-sono/verona-1.jpg 37% center,assets/foto/chi-sono/verona-2.jpg 30% center,assets/foto/chi-sono/profilo.jpg center 10%">
       <span class="panel-title">Chi Sono</span>
     </a>
     <!-- Collage a scorrimento continuo (panel--scroll, vedi js/panels.js):

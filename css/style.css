@@ -337,13 +337,10 @@ button {
   background-position: center;
 }
 
-/* Le foto di "Chi Sono" sono ritratti verticali: con "cover" centrato il
-   pannello (molto più largo che alto quando si espande in hover) tagliava
-   via il viso e mostrava solo il busto. Ancoriamo l'inquadratura in alto
-   così il volto resta sempre visibile. */
-.panel[href="chi-sono.html"] .panel-slide {
-  background-position: center top;
-}
+/* Inquadratura per singola foto: ogni voce di data-images può indicare la
+   propria background-position (vedi panels.js), applicata inline sulla slide.
+   Sostituisce la vecchia regola unica `center top` del pannello Chi Sono,
+   che andava bene per il ritratto verticale ma non per le foto orizzontali. */
 
 .panel-slide.is-active {
   opacity: 1;
@@ -1397,14 +1394,23 @@ button {
     letter-spacing: 0.1em;
   }
 
-  /* Landing: il primo blocco lascia spazio al nome */
-  .panels--landing .panel:first-child {
-    padding-top: 20vh;
-    min-height: 46vh;
+  /* Landing: su mobile il nome non sta sopra il primo pannello ma prima dei
+     pannelli, nel flusso della pagina. Sovrapposto al pannello Chi Sono ne
+     copriva proprio la parte alta, dove sta il viso di Samuele (le foto
+     orizzontali in un pannello quasi quadrato mostrano già tutta l'altezza,
+     quindi l'inquadratura non ha margine per spostarlo più in basso). */
+  .hero-name {
+    position: static;
+    transform: none;
+    padding: calc(var(--nav-height) + var(--space-xs)) var(--space-sm) var(--space-sm);
   }
 
-  .hero-name {
-    top: clamp(3.5rem, 8vh, 6rem);
+  .hero-name + .panels--landing {
+    margin-top: 0;
+  }
+
+  .panels--landing .panel:first-child {
+    min-height: 46vh;
   }
 
   .hero-name .tagline {
