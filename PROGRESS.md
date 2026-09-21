@@ -122,6 +122,7 @@ categorie, Contattami.
 | `js/stories.js` | Storie video in stile Instagram (fila di palline + visore a schermo intero); incluso solo nelle 5 pagine galleria, dopo `js/video-data.js` |
 | `js/splash.js` | Splash screen di benvenuto (incluso solo in `index.html`); anima il logo dallo splash alla nav (FLIP) all'uscita |
 | `js/video-data.js` | `VIDEO_DATA` con i 22 video reali (categoria, titolo, `verticale`, `src`, `poster`), letto da `js/stories.js`. `STREAM_DATA` eliminato |
+| `assets/favicon/` | Favicon generate da `assets/logo-sc.png`: `favicon-16.png`, `favicon-32.png`, `apple-touch-icon.png` (180), `icon-512.png` — vedi "Favicon" |
 | `assets/logo-sc.png` | Logo reale (ritagliato/ricolorato da `immagini/`), usato in nav/splash/footer |
 | `assets/foto/` | Foto reali ottimizzate per il web (ridimensionate/compresse dagli originali in `immagini/`), organizzate per categoria — vedi "Immagini reali inserite" |
 | `assets/video/` | Video reali (`eventi/`, `matrimoni/`, `sport/`) + `poster/` con le miniature — vedi "Video reali inseriti" |
@@ -984,6 +985,52 @@ brindisi; a riposo resta la foto dell'evento).
   dataset) controllati via HTTP, nessuno rotto. **Console**: nessun messaggio
   sulle 10 pagine.
 
+## Favicon
+
+Prima il sito non aveva favicon (icona generica del browser in ogni scheda).
+
+### File generati (`assets/favicon/`, con Pillow da `assets/logo-sc.png`)
+
+| File | Lato | Margine interno per lato | Collegato |
+|---|---|---|---|
+| `favicon-16.png` | 16 | 6% | `<link rel="icon" sizes="16x16">` |
+| `favicon-32.png` | 32 | 8% | `<link rel="icon" sizes="32x32">` |
+| `apple-touch-icon.png` | 180 | 12% | `<link rel="apple-touch-icon">` |
+| `icon-512.png` | 512 | 12% | non collegato (per completezza: servirà a un eventuale manifest/PWA) |
+
+- **Fondo pieno scuro**: il logo è bianco sporco (`#f2f2f0`) + "c" grigia
+  (`#606060`) su trasparente, quindi su una barra delle schede chiara sparirebbe.
+  Tutte le icone hanno fondo pieno `--color-bg` (`#0e0e10`), come un'icona di app:
+  si vedono sia in tema chiaro sia in tema scuro, senza media query.
+- **Ritaglio**: `logo-sc.png` (429x418) ha ~40px di trasparenza per lato e solo il
+  ~10% di pixel opachi. Il marchio viene prima ritagliato al bounding box
+  (`getchannel('A').getbbox()` → 349x338), poi ridimensionato (Lanczos) e
+  centrato nel quadrato con il margine indicato. Margini più stretti sulle icone
+  piccole, dove ogni pixel conta.
+- **Collegamento**: 3 `<link>` subito dopo il foglio di stile, in **tutte e 10**
+  le pagine HTML (verificato pagina per pagina che siano dentro `<head>`). Il 512
+  non è collegato: Chrome sceglie l'icona più adatta fra quelle dichiarate e, con
+  un 512 disponibile, potrebbe usare quello ridotto invece del 16/32 preparati.
+- Non c'è un `favicon.ico` nella root: i browser attuali usano i `<link>`; solo
+  strumenti datati lo cercano d'ufficio.
+
+### Verifica e limite a 16px
+
+La barra delle schede non è visibile allo strumento di automazione del browser
+(e in quella sessione l'estensione non era nemmeno connessa), quindi la scheda è
+stata ricostruita con Pillow alla dimensione reale e ingrandita, su barra chiara
+e scura. File serviti correttamente (200, `image/png`).
+
+- **Schermi ad alta densità** (Retina: Chrome usa il 32x32 nei 16px della
+  scheda): marchio completo e leggibile (S, c, cornice a mirino, punto).
+- **16px a densità normale**: si legge la "S" bianca su quadrato scuro, ma la
+  "c" grigia e la cornice sottile si riducono a pochi pixel grigi e quasi
+  spariscono — si riconosce un monogramma, non il logo intero. **Da decidere**:
+  una versione semplificata solo per il 16px (es. "S" e "c" più grandi senza
+  cornice, oppure "c" schiarita).
+- **Non verificato** in una scheda vera di Chrome/Safari/Firefox, né l'icona
+  aggiunta alla schermata Home su iOS.
+
 ## Deploy
 
 Il sito è **online su https://samuelecasabianca.com**.
@@ -1334,5 +1381,6 @@ descritta lì prima di collegarle):
    aggiornare i `src` in `js/video-data.js`.
 3. Inserire l'email reale di Samuele (i social sono già reali).
 4. Rifiniture su testi bio e descrizioni categorie (ora testi provvisori).
-5. Eventuale favicon e immagine Open Graph per la condivisione.
+5. ~~Favicon~~ — fatta, vedi "Favicon". Resta da valutare una versione semplificata
+   per il 16px (vedi lì) e l'immagine Open Graph per la condivisione.
 6. Deploy (hosting statico: GitHub Pages, Netlify, ecc.) — fuori scope attuale.
