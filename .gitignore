@@ -5,9 +5,9 @@ immagini/
 
 # ---- Video ----
 # I 22 MP4 (~2,2 GB) non stanno nel repo: esistono solo in locale in
-# assets/video/ e le storie (js/stories.js) li leggono da lì, quindi online
-# non funzionano finché non vengono caricati altrove (vedi PROGRESS.md).
-# Le miniature in assets/video/poster/ restano nel repo.
+# assets/video/ e video-watch.html li legge da lì, quindi online la
+# riproduzione non funziona finché non vengono caricati altrove (vedi
+# PROGRESS.md, "Deploy"). Le miniature in assets/video/poster/ restano.
 *.mp4
 *.mov
 *.MP4

@@ -20,13 +20,12 @@ Nessun build step, nessuna dipendenza (eccetto Google Fonts caricati via CDN):
 - [x] Crossfade solo-hover tra le slide dei pannelli (sostituisce il precedente
   scorrimento a filmstrip)
 - [x] `index.html` — landing con 3 pannelli + hero con nome
-- [x] **Sitemap ristrutturata (seconda volta)**: `lavoro.html` mostra direttamente le
-  4 categorie (Programmi TV / Celebrazioni / Eventi / Sport); `foto.html`,
-  Streaming e Video eliminati — vedi "Ristrutturazione: via Foto, Streaming e
-  Video; storie nelle gallerie" e l'albero sotto
-- [x] Pagine di navigazione a pannelli: `index.html` (3), `lavoro.html` (4), `celebrazioni.html` (2)
-- [x] **Storie video in stile Instagram** sopra la galleria di ogni pagina foglia
-  (`js/stories.js`) — vedi "Componente storie"
+- [x] Sitemap con `lavoro.html` come hub (Foto / Streaming / Video) e `foto.html`
+  con le 4 categorie fotografiche (vedi albero sotto)
+- [x] Pagine di navigazione a pannelli: `index.html` (3), `lavoro.html` (3), `foto.html` (4), `celebrazioni.html` (2)
+- [x] ~~Storie video in stile Instagram al posto di Streaming/Video~~ — **valutate e
+  accantonate su richiesta del cliente**: la versione resta nel branch
+  `ristrutturazione-storie` — vedi "Storie in stile Instagram: valutate e accantonate"
 - [x] **Eventi semplificata a galleria diretta** (come Sport e Programmi TV)
 - [x] **Sport semplificata a galleria diretta** (come Programmi TV): niente più
   sotto-categorie Rugby/Calcio/Pallavolo — vedi "Sport: da pannelli a galleria diretta"
@@ -38,8 +37,8 @@ Nessun build step, nessuna dipendenza (eccetto Google Fonts caricati via CDN):
 - [x] Responsive: pannelli impilati su mobile, menu hamburger overlay
 - [x] Splash screen di benvenuto sulla home (3 s, monogramma centrato, fade-out)
 - [x] Transizione animata tra pagine a pannelli (espansione in uscita + split in ingresso)
-- [x] ~~Sezioni Streaming e Video in stile piattaforma~~ — **eliminate**: i video ora
-  vivono come storie dentro le categorie, Streaming non arriverà
+- [x] Sezioni Streaming e Video in stile piattaforma (griglia + filtri + pagina di
+  riproduzione) — eliminate per le storie e poi **ripristinate** da `a3d555d`
 - [x] Foto reali inserite per Foto/Celebrazioni/Eventi Aziendali/Programmi TV/Sport Rugby,
   logo reale in nav/splash/footer, ritratto reale in `chi-sono.html` (vedi sezione
   "Immagini reali inserite" più sotto)
@@ -65,19 +64,20 @@ Nessun build step, nessuna dipendenza (eccetto Google Fonts caricati via CDN):
 - [ ] Foto reali per Brand/Gala (Eventi) e Calcio/Pallavolo (Sport): nessun file
   disponibile in `immagini/`; quando arriveranno vanno aggiunte alle masonry di
   `eventi.html` e `sport.html`
-- [x] **Video reali collegati** (22 file da `immagini/PORTFOLIO/VIDEO/`), con
-  miniature estratte dal video — oggi mostrati come storie nelle gallerie
-  (vedi "Componente storie")
+- [x] **Video reali collegati** (22 file da `immagini/PORTFOLIO/VIDEO/`): griglia,
+  filtri, pagine di riproduzione con `<video controls>` reale e miniature
+  estratte dal video — vedi "Video reali inseriti" più sotto
 - [x] **Chi Sono in home**: a riposo `verona-3.jpg` (Samuele dietro le telecamere),
   inquadratura impostata foto per foto — vedi "Chi Sono: foto iniziale e
   inquadratura per foto"
-- [x] **Storie con riquadro sempre verticale** e pulsante schermo intero sui video
-  orizzontali — vedi "Riquadro verticale e schermo intero"
 - [x] **Contattami in home**: due immagini nuove (`assets/foto/contattami/`),
   armonizzate con filtri CSS — vedi "Immagini del pannello Contattami"
+- [x] **Favicon** in tutte le pagine — vedi "Favicon"
+- [ ] Contenuti reali di Streaming (struttura pronta, ma
+  `immagini/PORTFOLIO/STREAMING/` è ancora **vuota**: nessun file arrivato)
 - [ ] **Video online**: i `.mp4` esistono solo in locale (esclusi dal repo), quindi
-  **sul sito pubblicato le storie non funzionano** finché i video non vengono
-  caricati su un hosting che serva file MP4 diretti — vedi "Deploy"
+  **sul sito pubblicato le pagine `video-watch.html` non riproducono nulla**
+  finché i video non vengono caricati altrove — vedi "Deploy"
 - [ ] Email reale (ora segnaposto). Instagram e LinkedIn sono già reali, sia in
   `contattami.html` sia nella riga `.social-links` delle pagine a pannelli
 - [ ] Deploy/hosting (fuori scope per questa fase)
@@ -85,22 +85,29 @@ Nessun build step, nessuna dipendenza (eccetto Google Fonts caricati via CDN):
 ## Sitemap
 
 ```
-index.html                          → 3 pannelli: Chi Sono | Il Mio Lavoro | Contattami
-├── chi-sono.html                   → bio
-├── lavoro.html                     → 4 pannelli: Programmi TV | Celebrazioni | Eventi | Sport
-│   ├── programmi-tv.html           → storie (segnaposto "in arrivo") + galleria
-│   ├── celebrazioni.html           → 2 pannelli: Feste Private | Matrimoni
-│   │   ├── celebrazioni-feste-private.html   → storie (segnaposto) + galleria
-│   │   └── celebrazioni-matrimoni.html       → storie (1 video) + galleria
-│   ├── eventi.html                 → storie (6 video) + galleria
-│   └── sport.html                  → storie (15 video) + galleria
-└── contattami.html                 → form + contatti
+lavoro.html                     → 3 pannelli: Foto | Streaming | Video
+├── foto.html                   → 4 pannelli: Celebrazioni | Eventi | Programmi TV | Sport
+│   ├── celebrazioni.html       → 2 pannelli: Feste Private | Matrimoni
+│   │   ├── celebrazioni-feste-private.html   → galleria
+│   │   └── celebrazioni-matrimoni.html       → galleria
+│   ├── eventi.html             → galleria diretta (come programmi-tv.html)
+│   ├── programmi-tv.html       → galleria diretta
+│   └── sport.html              → galleria diretta (come programmi-tv.html)
+├── streaming.html               → griglia stile YouTube/Twitch (in costruzione lato contenuti)
+│   └── streaming-watch.html     → pagina di riproduzione (?v=ID)
+└── video.html                   → griglia stile YouTube con filtri categoria
+    └── video-watch.html         → pagina di riproduzione (?v=ID&cat=CATEGORIA)
 ```
 
-Ogni breadcrumb interno riflette questo albero: "Lavoro / Sport",
-"Lavoro / Celebrazioni / Matrimoni" (niente più livello "Foto"). Il menu hamburger
-(generato da `js/main.js`) elenca Home, Chi Sono, Il Mio Lavoro con sotto le 4
-categorie, Contattami.
+Ogni breadcrumb interno riflette questo albero (es. "Lavoro / Foto / Sport / Rugby").
+`index.html` e `chi-sono.html` continuano a puntare a `lavoro.html` (invariato come
+punto d'ingresso del "Mio Lavoro"). Il menu hamburger (`js/main.js`) riflette lo
+stesso albero: Il Mio Lavoro → Foto (con le 4 categorie annidate) / Streaming /
+Video.
+
+> Una versione alternativa senza Foto/Streaming/Video, con i video come storie
+> dentro le gallerie, è stata valutata e accantonata: vedi "Storie in stile
+> Instagram: valutate e accantonate" e il branch `ristrutturazione-storie`.
 
 ## Struttura del progetto
 
@@ -108,23 +115,27 @@ categorie, Contattami.
 |---|---|
 | `index.html` | Landing: hero col nome + 3 pannelli (Chi Sono / Il Mio Lavoro / Contattami) — foto reali; crossfade su Chi Sono e Contattami, collage a scorrimento continuo (`panel--scroll`) su Il Mio Lavoro |
 | `chi-sono.html` | Pagina statica bio: ritratto reale (`assets/foto/chi-sono/profilo.jpg`) a sinistra, testo a destra |
-| `lavoro.html` | 4 pannelli con foto reali: Programmi TV / Celebrazioni / Eventi / Sport (prima stavano in `foto.html`, eliminata) |
+| `lavoro.html` | Hub, 3 pannelli: Foto (foto reali) / Streaming (placeholder) / Video (placeholder) |
+| `foto.html` | 4 pannelli, tutti con foto reali: Programmi TV / Celebrazioni / Eventi / Sport |
 | `celebrazioni.html` | 2 pannelli con foto reali: Matrimoni / Feste Private |
-| `eventi.html` | Storie (6 video) + galleria diretta — 50 foto reali (ex Aziendali/Brand/Gala unite) |
-| `sport.html` | Storie (15 video) + galleria diretta — 54 foto reali (ex Rugby/Calcio/Pallavolo unite) |
-| `programmi-tv.html` | Storie (segnaposto "Video in arrivo") + galleria — 17 foto reali |
-| `celebrazioni-matrimoni.html` | Storie (1 video) + galleria — 47 foto reali |
-| `celebrazioni-feste-private.html` | Storie (segnaposto "Video in arrivo") + galleria — 28 foto reali |
+| `eventi.html` | Galleria diretta — 50 foto reali (ex Aziendali/Brand/Gala unite) |
+| `sport.html` | Galleria diretta — 54 foto reali (ex Rugby/Calcio/Pallavolo unite) |
+| `programmi-tv.html` | Galleria — 17 foto reali |
+| `celebrazioni-matrimoni.html` | Galleria — 47 foto reali |
+| `celebrazioni-feste-private.html` | Galleria — 28 foto reali |
+| `streaming.html` | Griglia stile YouTube/Twitch, 10 card placeholder (dati da `js/video-data.js`) |
+| `streaming-watch.html` | Pagina di riproduzione streaming (player placeholder + correlati), legge `?v=ID` |
+| `video.html` | Griglia stile YouTube con filtri Tutti/Eventi/Matrimoni/Sport, **22 card reali** (6 eventi, 1 matrimoni, 15 sport) |
+| `video-watch.html` | Pagina di riproduzione video: **`<video controls>` reale** + correlati, legge `?v=ID&cat=CATEGORIA` |
 | `contattami.html` | Form contatti (mailto:) + email/Instagram/LinkedIn |
 | `css/style.css` | Tutto lo stile; variabili tema in `:root` in cima al file |
-| `js/panels.js` | `initVerticalPanels()`: crossfade slide solo-hover, collage `panel--scroll`, inquadratura per foto in `data-images`, transizioni animate tra pagine a pannelli |
-| `js/main.js` | Menu hamburger overlay, lightbox galleria, form mailto (auto-init su DOMContentLoaded) |
-| `js/stories.js` | Storie video in stile Instagram (fila di palline + visore a schermo intero); incluso solo nelle 5 pagine galleria, dopo `js/video-data.js` |
+| `js/panels.js` | `initVerticalPanels()`: crossfade slide solo-hover, collage `panel--scroll`, inquadratura per foto e `data-src` in `data-images`, transizioni animate tra pagine a pannelli |
+| `js/main.js` | Menu hamburger overlay, lightbox galleria, form mailto (auto-init su DOMContentLoaded) + helper condivisi delle sezioni video (`escapeHtml`, `videoThumbHtml`, `videoPlayerHtml`) |
 | `js/splash.js` | Splash screen di benvenuto (incluso solo in `index.html`); anima il logo dallo splash alla nav (FLIP) all'uscita |
-| `js/video-data.js` | `VIDEO_DATA` con i 22 video reali (categoria, titolo, `verticale`, `src`, `poster`), letto da `js/stories.js`. `STREAM_DATA` eliminato |
-| `assets/favicon/` | Favicon generate da `assets/logo-sc.png`: `favicon-16.png`, `favicon-32.png`, `apple-touch-icon.png` (180), `icon-512.png` — vedi "Favicon" |
+| `js/video-data.js` | Dataset condiviso da `streaming.html`/`streaming-watch.html`/`video.html`/`video-watch.html`: `VIDEO_DATA` con i 22 video reali, `STREAM_DATA` ancora placeholder |
+| `assets/favicon/` | Favicon generate da `assets/logo-sc.png` (16, 32, apple-touch 180, 512) — vedi "Favicon" |
 | `assets/logo-sc.png` | Logo reale (ritagliato/ricolorato da `immagini/`), usato in nav/splash/footer |
-| `assets/foto/` | Foto reali ottimizzate per il web (ridimensionate/compresse dagli originali in `immagini/`), organizzate per categoria — vedi "Immagini reali inserite" |
+| `assets/foto/` | Foto reali ottimizzate per il web (ridimensionate/compresse dagli originali in `immagini/`), organizzate per categoria — vedi "Immagini reali inserite"; `contattami/` contiene le due immagini del pannello Contattami |
 | `assets/video/` | Video reali (`eventi/`, `matrimoni/`, `sport/`) + `poster/` con le miniature — vedi "Video reali inseriti" |
 | `immagini/` | Cartella sorgente con gli originali a piena risoluzione ricevuti da Samuele (non referenziata direttamente dal sito, vedi sotto) |
 
@@ -731,6 +742,14 @@ forzando la cache prima dei test.
 
 ## Ristrutturazione: via Foto, Streaming e Video; storie nelle gallerie
 
+> **ACCANTONATA** — questa sezione e le sottosezioni che seguono ("Componente
+> storie", "Riquadro verticale e schermo intero") descrivono la versione con le
+> storie in stile Instagram, **non più attiva**: il cliente ha chiesto di tornare
+> alla divisione Foto / Streaming / Video. Restano come documentazione del branch
+> `ristrutturazione-storie`. Le parti ancora valide qui dentro sono "Chi Sono:
+> foto iniziale e inquadratura per foto" e "Immagini del pannello Contattami".
+> Vedi "Storie in stile Instagram: valutate e accantonate".
+
 Lavoro fatto sul branch locale `ristrutturazione-storie` (non su `main`, che
 resta com'era; niente push). Commit:
 `8234858` (lavoro dei passaggi precedenti: social, pannelli smussati, collage),
@@ -1007,8 +1026,10 @@ Prima il sito non aveva favicon (icona generica del browser in ogni scheda).
   (`getchannel('A').getbbox()` → 349x338), poi ridimensionato (Lanczos) e
   centrato nel quadrato con il margine indicato. Margini più stretti sulle icone
   piccole, dove ogni pixel conta.
-- **Collegamento**: 3 `<link>` subito dopo il foglio di stile, in **tutte e 10**
-  le pagine HTML (verificato pagina per pagina che siano dentro `<head>`). Il 512
+- **Collegamento**: 3 `<link>` subito dopo il foglio di stile, in **tutte** le
+  pagine HTML (verificato pagina per pagina che siano dentro `<head>`; erano 10,
+  dopo il ripristino di Foto/Streaming/Video sono 15 e le 5 ripristinate hanno
+  ricevuto gli stessi `<link>`). Il 512
   non è collegato: Chrome sceglie l'icona più adatta fra quelle dichiarate e, con
   un 512 disponibile, potrebbe usare quello ridotto invece del 16/32 preparati.
 - Non c'è un `favicon.ico` nella root: i browser attuali usano i `<link>`; solo
@@ -1031,6 +1052,95 @@ e scura. File serviti correttamente (200, `image/png`).
 - **Non verificato** in una scheda vera di Chrome/Safari/Firefox, né l'icona
   aggiunta alla schermata Home su iOS.
 
+## Storie in stile Instagram: valutate e accantonate
+
+**Perché esiste il branch `ristrutturazione-storie`.** In un giro di lavoro la
+divisione Foto / Streaming / Video era stata eliminata: `lavoro.html` mostrava
+direttamente le 4 categorie e i video vivevano come storie in stile Instagram
+(fila di palline + visore a schermo intero, `js/stories.js`) sopra le gallerie.
+Il cliente ha visto il prototipo e **ha chiesto di tornare alla struttura con Foto,
+Streaming e Video**; il lavoro estetico fatto nel frattempo invece resta.
+La versione con le storie **non è stata cancellata**: è la punta del branch
+locale `ristrutturazione-storie` (commit `7c0049a`), completa e funzionante, se
+un giorno servisse di nuovo. Le sezioni "Ristrutturazione: …", "Componente
+storie" e "Riquadro verticale e schermo intero" qui sopra la descrivono.
+
+### Branch
+
+```
+main                           a3d555d   struttura vecchia, senza il lavoro estetico recente
+ristrutturazione-storie        7c0049a   versione con le storie (accantonata) + estetica + favicon
+ripristino-foto-streaming-video           struttura Foto/Streaming/Video + estetica + favicon (attuale)
+```
+
+Il ripristino è stato fatto su un branch nuovo, partito da
+`ristrutturazione-storie`, proprio perché quel branch resti la versione con le
+storie.
+
+### Come è stato fatto il ripristino (niente riscritto a memoria)
+
+- **Recuperati da `a3d555d`** (`git checkout a3d555d -- …`): `streaming.html`,
+  `streaming-watch.html`, `video.html`, `video-watch.html`, `js/main.js`
+  (menu con Foto/Streaming/Video e categorie annidate, `escapeHtml`,
+  `videoThumbHtml`, `videoPlayerHtml`) e `js/video-data.js` (con `STREAM_DATA`;
+  `VIDEO_DATA` era identico, verificato riga per riga). Per `main.js` e
+  `video-data.js` verificato prima che le differenze fra `a3d555d` e la versione
+  con le storie fossero solo quelle della ristrutturazione.
+- **Recuperati da `8234858`** (il commit del lavoro estetico fatto *prima* della
+  ristrutturazione): `foto.html`, `lavoro.html`, `celebrazioni.html` e le 5
+  gallerie. Verificato con `git diff` che siano esattamente i file di `a3d555d`
+  più la riga social sulle pagine a pannelli (`foto.html`, `lavoro.html`,
+  `celebrazioni.html`) e i link social reali: breadcrumb con "Foto", gallerie
+  senza storie.
+- **CSS**: reinseriti testualmente da `8234858` la sezione "Sezioni Streaming e
+  Video" (`.video-grid`, `.video-card`, `.video-thumb`, `.watch-*`, `.chip`,
+  `.filter-chips`), `.panel-note` (badge "Contenuti in arrivo" del pannello
+  Streaming) e `.mobile-menu a.menu-sub2`; rimossa tutta la sezione delle storie
+  e del visore (pulsante schermo intero compreso). Confronto finale con
+  `8234858`: le sole differenze rimaste sono il lavoro estetico successivo
+  (inquadratura per foto di Chi Sono, filtri di Contattami, `.panel-expander-bg`,
+  nome della home sopra i pannelli su mobile).
+- **Rimosso**: `js/stories.js` e ogni riferimento (nessuna pagina lo include,
+  nessun `.stories` nel markup).
+- **Allineamento delle pagine ripristinate**: tutte ricevono i `<link>` della
+  favicon; `foto.html` (pagina a pannelli) ha la riga social e l'aspetto nuovo
+  dei riquadri come `lavoro.html` e `celebrazioni.html` (lo stile è tutto nel CSS
+  condiviso); nav e footer sono gli stessi delle altre pagine.
+- `README.md` e il commento in `.gitignore` ripresi da `a3d555d`, ma la frase
+  "i video sono su YouTube via embed" è stata corretta: non era vera nemmeno
+  allora, i video sono solo in locale.
+- **Resta invariato**: pannelli ridimensionati e smussati, riga social, collage
+  della home, Chi Sono con `verona-3.jpg`, immagini di Contattami, favicon;
+  `eventi.html` e `sport.html` restano gallerie dirette.
+
+### Verifiche fatte in browser (Chrome, `python3 -m http.server 8000`)
+
+- **Percorso con click veri**: home → Il Mio Lavoro ("Lavoro": Foto / Streaming /
+  Video) → Foto ("Lavoro / Foto") → Programmi TV, Eventi, Sport
+  ("Lavoro / Foto / …") e Celebrazioni ("Lavoro / Foto / Celebrazioni") →
+  Matrimoni e Feste Private ("Lavoro / Foto / Celebrazioni / …"). Animazioni di
+  uscita e ingresso a ogni passaggio; lightbox funzionante (1/28 → 2/28, ESC).
+- **Streaming**: 10 card segnaposto, click → `streaming-watch.html?v=3` con
+  titolo, player segnaposto e 8 correlati. **Video**: 22 card, 0 miniature
+  rotte, filtri Tutti 22 / Eventi 6 / Matrimoni 1 / Sport 15 (nessuna card fuori
+  categoria), 0 `<video>` e 0 `.mp4` scaricati nella griglia;
+  `video-watch.html?v=7` (Matrimonio Claudia & Ivan): titolo con `&` corretto,
+  player reale con `preload="metadata"` (durata 4:58 letta), 8 correlati.
+- **Nessuna traccia delle storie**: 0 pagine con `stories`, `js/stories.js`
+  assente (404).
+- **Pagine ripristinate come le altre**: favicon in tutte e 15; `foto.html` e
+  `lavoro.html` con riquadri a 18px, spaziature e riga social identiche a
+  `celebrazioni.html` (pannelli 64–812, social 812–900 a 1440x900); guardate a
+  375px `foto.html`, `video.html`, `video-watch.html`.
+- **Home**: collage che scorre, Chi Sono a riposo su `verona-3.jpg`.
+- **Menu hamburger**: Home, Chi Sono, Il Mio Lavoro → Foto (→ Programmi TV,
+  Celebrazioni, Eventi, Sport) / Streaming / Video, Contattami.
+- **Link**: 268 riferimenti locali unici (15 pagine, menu, 22 video e poster)
+  controllati via HTTP, nessuno rotto. **Console**: nessun messaggio sulle 15
+  pagine. **Scroll orizzontale**: nessuno, a 1440 e a 375, su tutte le pagine.
+- **Non verificato**: la riproduzione vera in `video-watch.html` oltre ai
+  metadati (non è cambiata rispetto a `a3d555d`), Safari/Firefox, telefoni reali.
+
 ## Deploy
 
 Il sito è **online su https://samuelecasabianca.com**.
@@ -1044,16 +1154,15 @@ Il sito è **online su https://samuelecasabianca.com**.
 - **Cosa non sta nel repo** (vedi `.gitignore`): gli originali di `immagini/`,
   tutti i file `.mp4` e i PDF. **I video esistono solo in locale** in
   `assets/video/`: `js/video-data.js` punta a quei file, quindi **sul sito
-  pubblicato le storie non funzionano** (le palline si vedono, perché i poster
-  sono nel repo, ma il video non parte) finché i video non vengono caricati
-  altrove e i `src` aggiornati.
-- **Dove caricarli**: le storie usano un `<video>` HTML con barrette di
-  avanzamento, passaggio automatico e salto fra video, quindi serve un hosting che
-  serva **file MP4 diretti** con supporto alle richieste Range (es. Vercel Blob,
-  Cloudflare R2, Bunny). Il vecchio piano "YouTube via embed" non è compatibile:
-  richiederebbe di riscrivere `js/stories.js` sulle API di YouTube. Prima
-  conviene ricomprimerli (vedi "Da fare quando ci sarà `ffmpeg`"): oggi vanno da
-  ~45 a ~300 MB l'uno.
+  pubblicato le pagine `video-watch.html` non riproducono nulla** (griglia e
+  miniature invece funzionano, i poster sono nel repo) finché i video non vengono
+  caricati altrove e i `src` aggiornati.
+- **Dove caricarli**: `video-watch.html` usa un `<video controls>` HTML, quindi
+  basta un hosting di file MP4 diretti con supporto alle richieste Range (es.
+  Vercel Blob, Cloudflare R2, Bunny). In alternativa un embed YouTube, ma
+  richiederebbe di cambiare `videoPlayerHtml()` in `js/main.js`. Prima conviene
+  ricomprimerli (vedi "Da fare quando ci sarà `ffmpeg`"): oggi vanno da ~45 a
+  ~300 MB l'uno.
 
 ## Bugfix
 
@@ -1309,8 +1418,7 @@ passare al successivo).
   corrispondere alle rispettive `transition`/`animation` CSS).
 - **Transizione tra pagine a pannelli**: gestita da `initVerticalPanels()` in
   `js/panels.js`, quindi attiva automaticamente su tutte le pagine a pannelli
-  (index, lavoro, celebrazioni — `foto.html` è stata eliminata, eventi e sport
-  sono diventate gallerie). Stili nella sezione
+  (index, lavoro, foto, celebrazioni — eventi e sport sono diventate gallerie). Stili nella sezione
   `/* === Transizioni pannelli === */` di `css/style.css`. Due metà:
   - **Uscita**: al click su un pannello il JS fa `preventDefault()`, crea un
     clone visivo (`.panel-expander`, `position: fixed` sul rettangolo del
@@ -1333,15 +1441,39 @@ passare al successivo).
     navigazione è immediata. Le pagine galleria (foglie) non hanno animazione
     d'ingresso: ricevono la normale navigazione dopo l'espansione del pannello
     genitore.
-- **Sezioni Streaming e Video** — *eliminate* nella ristrutturazione (vedi
-  "Ristrutturazione: via Foto, Streaming e Video; storie nelle gallerie"). Le
-  griglie in stile piattaforma, i filtri a chip, le pagine `*-watch.html`, il loro
-  CSS (`.video-grid`, `.video-card`, `.watch-*`, `.chip`, `.panel-note`) e gli
-  helper di `js/main.js` non esistono più. I video vivono come storie dentro le
-  categorie (vedi "Componente storie").
+- **Sezioni Streaming e Video** (`streaming.html`, `video.html` +
+  `streaming-watch.html`, `video-watch.html`): non usano il componente
+  pannelli, ma una griglia in stile piattaforma video (`.video-grid` /
+  `.video-card`, card 16:9 con titolo/canale/durata placeholder sotto).
+  - **Dataset condiviso**: `js/video-data.js` espone due array globali,
+    `STREAM_DATA` e `VIDEO_DATA` (oggetti `{ id, titolo, categoria, canale,
+    durata, descrizione }`, `categoria` solo sui video). Le quattro pagine lo
+    includono e leggono solo da lì — **quando arriveranno i contenuti reali,
+    basta sostituire questi due array** (e collegare l'url/embed del player al
+    posto del placeholder), nessun'altra modifica a HTML necessaria.
+  - **Griglie** (`streaming.html`/`video.html`): la griglia viene generata da
+    uno script inline che mappa il dataset in card `<a class="video-card"
+    href="…-watch.html?v=ID(&cat=CATEGORIA)">`. In `video.html` le card hanno
+    anche `data-categoria`.
+  - **Filtro categoria** (solo `video.html`): chip `.chip` (Tutti / Eventi /
+    Matrimoni / Sport); al click aggiunge `.is-filtered-out` (`opacity: 0;
+    pointer-events: none`) alle card non corrispondenti — filtro client-side,
+    nessuna ricarica pagina, nessun layout reflow oltre alla dissolvenza.
+  - **Pagine di riproduzione** (`streaming-watch.html`/`video-watch.html`):
+    layout a due colonne `.watch-layout` (player + info a sinistra, correlati
+    `.watch-related-list` a destra; a una colonna sotto i 900px). Leggono
+    `v` (e `cat`) dalla query string con `URLSearchParams`, cercano il record
+    corrispondente nel dataset e popolano titolo/meta/descrizione/breadcrumb
+    via JS; i correlati sono le altre voci del dataset (in `video-watch.html`
+    prima quelle della stessa categoria, poi le altre), max 8. Il player
+    (`.watch-player`) è un placeholder cliccabile senza azione reale, marcato
+    con `<!-- TODO: sostituire con player video reale -->`.
+  - Il pannello "Streaming" su `lavoro.html` porta un badge
+    `.panel-note` ("Contenuti in arrivo"): la pagina è già funzionante, manca
+    solo il contenuto video reale.
 - **Classi CSS principali**: `.panels`/`.panel`/`.panel-title`/`.panel-slides`/
   `.panel-slide`, `.panel-montage` (collage a scorrimento), `.social-links`/`.social-link`, `.masonry`/`.masonry-item`,
-  `.stories`/`.story`/`.story-viewer` (storie video), `.ph` (placeholder foto generico), `.site-nav`,
+  `.video-grid`/`.video-card`, `.watch-layout`, `.chip`, `.ph` (placeholder foto generico), `.site-nav`,
   `.lightbox`, `.mobile-menu`, `.btn`.
 
 ## Placeholder ancora da sostituire
@@ -1356,14 +1488,13 @@ descritta lì prima di collegarle):
   è una galleria unica), quindi quando arriveranno andranno semplicemente
   aggiunte alla masonry di `sport.html`
 
-**Video**:
-- Nessun video per Programmi TV e Feste Private: le loro file di storie mostrano il
-  segnaposto "Video in arrivo". Quando arriveranno, basta aggiungere voci a
-  `VIDEO_DATA` con `categoria: 'programmi-tv'` o `'feste-private'` (i
-  `data-categoria` di quelle pagine), più il poster in `assets/video/poster/`.
-- I `.mp4` sono solo in locale: vanno caricati su un hosting di file MP4 diretti e
-  i `src` aggiornati perché le storie funzionino online (vedi "Deploy").
-- Streaming è stato eliminato: quei contenuti non arriveranno.
+**Streaming** (sostituire l'array `STREAM_DATA` in `js/video-data.js`):
+- 10 voci placeholder per `streaming.html`/`streaming-watch.html`; la cartella
+  sorgente `immagini/PORTFOLIO/STREAMING/` è ancora vuota
+- Pannello "Streaming" su `lavoro.html` (badge "Contenuti in arrivo")
+
+> *Nota*: `VIDEO_DATA` **non** è più un placeholder — contiene i 22 video reali
+> con `src` e `poster`. Vedi "Video reali: 22 file inseriti".
 
 **Altri**:
 - `contattami.html` — email reale (anche in `js/main.js`, funzione
@@ -1376,9 +1507,9 @@ descritta lì prima di collegarle):
 
 1. Ricevere le foto mancanti (Brand, Gala, Calcio, Pallavolo) e inserirle con la
    stessa pipeline usata per le altre categorie (vedi "Immagini reali inserite").
-2. Pubblicare i video: caricarli su un hosting che serva file MP4 diretti (non
-   un embed YouTube, vedi "Deploy"), idealmente dopo averli ricompressi, e
-   aggiornare i `src` in `js/video-data.js`.
+2. Pubblicare i video: caricarli altrove (idealmente dopo averli ricompressi) e
+   aggiornare i `src` in `js/video-data.js`, vedi "Deploy". Streaming: ricevere i
+   contenuti e sostituire `STREAM_DATA`.
 3. Inserire l'email reale di Samuele (i social sono già reali).
 4. Rifiniture su testi bio e descrizioni categorie (ora testi provvisori).
 5. ~~Favicon~~ — fatta, vedi "Favicon". Resta da valutare una versione semplificata
