@@ -4,8 +4,10 @@
 immagini/
 
 # ---- Video ----
-# I 22 MP4 (~2,2 GB) non stanno nel repo: sono su YouTube e il sito
-# li mostra via embed. Le miniature in assets/video/poster/ restano.
+# I 22 MP4 (~2,2 GB) non stanno nel repo: esistono solo in locale in
+# assets/video/ e le storie (js/stories.js) li leggono da lì, quindi online
+# non funzionano finché non vengono caricati altrove (vedi PROGRESS.md).
+# Le miniature in assets/video/poster/ restano nel repo.
 *.mp4
 *.mov
 *.MP4

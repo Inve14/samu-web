@@ -1,44 +1,32 @@
 /* ==========================================================================
-   video-data.js — dataset condiviso dalle pagine Streaming e Video
-   (streaming.html, streaming-watch.html, video.html, video-watch.html).
+   video-data.js — dataset dei video, letto da js/stories.js per la fila di
+   storie in cima alle pagine galleria (sport.html, eventi.html,
+   celebrazioni-matrimoni.html; programmi-tv.html e
+   celebrazioni-feste-private.html mostrano il segnaposto "in arrivo" finché
+   non c'è nessun video della loro categoria).
 
-   Le pagine leggono solo questi due array: per aggiungere o togliere un
-   contenuto non serve nessun'altra modifica a HTML o JS.
+   Per aggiungere o togliere un video basta modificare questo array: la
+   pagina mostra le voci con `categoria` uguale al suo `data-categoria`.
 
    Campi di ogni voce:
-     id           numero univoco (dentro il proprio array), usato in ?v=ID
-     titolo       titolo leggibile mostrato nella griglia e nel player
-     categoria    solo VIDEO_DATA: 'eventi' | 'matrimoni' | 'sport'
-                  (deve combaciare con i data-filter dei chip in video.html)
-     canale       etichetta mostrata nei meta
+     id           numero univoco
+     titolo       titolo leggibile (sotto la pallina e nel visore)
+     categoria    'eventi' | 'matrimoni' | 'sport' — combacia con il
+                  data-categoria della fila .stories della pagina
+     canale       etichetta, oggi non mostrata
      durata       'M:SS', letta dall'atomo mvhd del file MP4
-     verticale    true se il file è girato in verticale (9:16): il player e la
-                  miniatura si adattano invece di deformare l'immagine
-     src          percorso del file video reale; se manca, la pagina mostra il
-                  placeholder al posto del player
-     poster       fotogramma di copertina; se manca, si vede il placeholder
-     descrizione  testo sotto al player
+     verticale    true se il file è girato in verticale (9:16): nel visore
+                  riempie lo schermo come una storia vera; gli orizzontali
+                  restano interi e centrati
+     src          percorso del file video. NB: i file .mp4 sono esclusi dal
+                  repository (.gitignore) ed esistono solo in locale: online
+                  le storie non funzionano finché non vengono caricati altrove
+     poster       fotogramma di copertina (miniatura circolare della pallina)
+     descrizione  testo descrittivo, oggi non mostrato
 
-   STREAM_DATA è ancora un placeholder: la cartella sorgente
-   `immagini/PORTFOLIO/STREAMING/` è vuota, non è arrivato nessun file di
-   streaming. Le voci qui sotto non hanno `src` né `poster`, quindi
-   streaming.html e streaming-watch.html continuano a mostrare i segnaposto.
-   Quando arriveranno i file, basterà aggiungere `src` e `poster` a ogni voce
-   (stessa forma di VIDEO_DATA) perché il player reale compaia da solo.
+   La sezione Streaming (e il suo array STREAM_DATA) è stata eliminata: quei
+   contenuti non arriveranno. Vedi PROGRESS.md.
    ========================================================================== */
-
-const STREAM_DATA = [
-  { id: 1, titolo: 'Streaming placeholder 1', canale: 'Samuele Casabianca', durata: '1:12:40', descrizione: 'Descrizione placeholder dello streaming. Contenuto reale in arrivo.' },
-  { id: 2, titolo: 'Streaming placeholder 2', canale: 'Samuele Casabianca', durata: '0:48:15', descrizione: 'Descrizione placeholder dello streaming. Contenuto reale in arrivo.' },
-  { id: 3, titolo: 'Streaming placeholder 3', canale: 'Samuele Casabianca', durata: '2:03:22', descrizione: 'Descrizione placeholder dello streaming. Contenuto reale in arrivo.' },
-  { id: 4, titolo: 'Streaming placeholder 4', canale: 'Samuele Casabianca', durata: '0:35:50', descrizione: 'Descrizione placeholder dello streaming. Contenuto reale in arrivo.' },
-  { id: 5, titolo: 'Streaming placeholder 5', canale: 'Samuele Casabianca', durata: '1:29:05', descrizione: 'Descrizione placeholder dello streaming. Contenuto reale in arrivo.' },
-  { id: 6, titolo: 'Streaming placeholder 6', canale: 'Samuele Casabianca', durata: '0:52:18', descrizione: 'Descrizione placeholder dello streaming. Contenuto reale in arrivo.' },
-  { id: 7, titolo: 'Streaming placeholder 7', canale: 'Samuele Casabianca', durata: '1:41:37', descrizione: 'Descrizione placeholder dello streaming. Contenuto reale in arrivo.' },
-  { id: 8, titolo: 'Streaming placeholder 8', canale: 'Samuele Casabianca', durata: '0:59:12', descrizione: 'Descrizione placeholder dello streaming. Contenuto reale in arrivo.' },
-  { id: 9, titolo: 'Streaming placeholder 9', canale: 'Samuele Casabianca', durata: '1:17:44', descrizione: 'Descrizione placeholder dello streaming. Contenuto reale in arrivo.' },
-  { id: 10, titolo: 'Streaming placeholder 10', canale: 'Samuele Casabianca', durata: '0:41:29', descrizione: 'Descrizione placeholder dello streaming. Contenuto reale in arrivo.' },
-];
 
 /* Video reali, da `immagini/PORTFOLIO/VIDEO/<CATEGORIA>/` (vedi PROGRESS.md):
    la categoria di ogni video viene dalla sottocartella in cui si trovava. */

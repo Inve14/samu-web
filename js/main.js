@@ -17,13 +17,10 @@ function initMobileMenu() {
     <a href="index.html">Home</a>
     <a href="chi-sono.html">Chi Sono</a>
     <a href="lavoro.html">Il Mio Lavoro</a>
-    <a class="menu-sub" href="foto.html">Foto</a>
-    <a class="menu-sub menu-sub2" href="programmi-tv.html">Programmi TV</a>
-    <a class="menu-sub menu-sub2" href="celebrazioni.html">Celebrazioni</a>
-    <a class="menu-sub menu-sub2" href="eventi.html">Eventi</a>
-    <a class="menu-sub menu-sub2" href="sport.html">Sport</a>
-    <a class="menu-sub" href="streaming.html">Streaming</a>
-    <a class="menu-sub" href="video.html">Video</a>
+    <a class="menu-sub" href="programmi-tv.html">Programmi TV</a>
+    <a class="menu-sub" href="celebrazioni.html">Celebrazioni</a>
+    <a class="menu-sub" href="eventi.html">Eventi</a>
+    <a class="menu-sub" href="sport.html">Sport</a>
     <a href="contattami.html">Contattami</a>
   `;
   document.body.appendChild(menu);
@@ -144,54 +141,6 @@ function initContactForm() {
     // TODO: sostituire con l'email reale di Samuele
     window.location.href = `mailto:info@samuelecasabianca.it?subject=${subject}&body=${body}`;
   });
-}
-
-/* ---------- Sezioni Streaming e Video ----------
-   Helper condivisi da streaming.html, video.html e dalle rispettive pagine
-   `-watch.html`, che leggono STREAM_DATA / VIDEO_DATA (js/video-data.js).
-   Ogni voce senza `src`/`poster` ricade sul segnaposto, così le pagine
-   funzionano sia con i contenuti reali sia in attesa che arrivino. */
-
-/* Testo proveniente dal dataset inserito dentro un template HTML: va
-   neutralizzato, altrimenti titoli con & o virgolette rompono il markup. */
-function escapeHtml(text) {
-  return String(text).replace(/[&<>"']/g, (ch) => ({
-    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
-  }[ch]));
-}
-
-/* Miniatura di una card: fotogramma reale se disponibile, altrimenti il
-   riquadro tratteggiato di prima. `loading="lazy"` come nelle gallerie. */
-function videoThumbHtml(v, baseClass = 'video-thumb') {
-  if (!v.poster) return `<div class="${baseClass}">Video...</div>`;
-  const vertical = v.verticale ? ' is-vertical' : '';
-  return `
-    <div class="${baseClass} ${baseClass}--real${vertical}">
-      <img src="${escapeHtml(v.poster)}" alt="${escapeHtml(v.titolo)}" loading="lazy">
-    </div>`;
-}
-
-/* Player della pagina di riproduzione. Niente autoplay e `preload="metadata"`:
-   i file sono da decine di MB, così la pagina scarica solo l'intestazione e
-   il resto parte al play dell'utente. */
-function videoPlayerHtml(v) {
-  if (!v.src) {
-    return `
-      <div class="watch-player">
-        <span class="watch-player-icon">&#9654;</span>
-        <span class="watch-player-label">Video placeholder</span>
-      </div>`;
-  }
-  const vertical = v.verticale ? ' is-vertical' : '';
-  const poster = v.poster ? ` poster="${escapeHtml(v.poster)}"` : '';
-  return `
-    <div class="watch-player watch-player--real${vertical}">
-      <video controls preload="metadata"${poster} playsinline>
-        <source src="${escapeHtml(v.src)}" type="video/mp4">
-        Il tuo browser non supporta il tag video.
-        <a href="${escapeHtml(v.src)}">Scarica il video</a>.
-      </video>
-    </div>`;
 }
 
 /* ---------- Avvio ---------- */
