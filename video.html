@@ -15,7 +15,7 @@
 </head>
 <body>
 
-  <header class="site-nav site-nav--solid">
+  <header class="site-nav">
     <a class="logo-sc" href="index.html" aria-label="Torna alla home"><img src="assets/logo-sc.png" alt="Samuele Casabianca — logo"></a>
     <nav class="breadcrumb" aria-label="Percorso">
       <a href="lavoro.html">Lavoro</a>
@@ -30,57 +30,45 @@
     </div>
   </header>
 
-  <main class="page-content">
-    <div class="page-heading">
-      <h1>Video</h1>
-      <p>I video di eventi, matrimoni e giornate sportive raccontati da Samuele.</p>
-    </div>
-
-    <div class="filter-chips" id="filter-chips">
-      <button class="chip is-active" data-filter="tutti">Tutti</button>
-      <button class="chip" data-filter="eventi">Eventi</button>
-      <button class="chip" data-filter="matrimoni">Matrimoni</button>
-      <button class="chip" data-filter="sport">Sport</button>
-    </div>
-
-    <!-- Griglia stile piattaforma video: popolata da JS a partire da VIDEO_DATA (js/video-data.js) -->
-    <div class="video-grid" id="video-grid"></div>
+  <!-- Pannelli verticali: le 3 categorie video (prima una griglia unica con
+       filtri a chip, sostituita dai pannelli su richiesta del cliente — vedi
+       PROGRESS.md). Fotogrammi di copertina da assets/video/poster/, solo della
+       categoria del pannello; Matrimoni ha un solo video, quindi una sola
+       immagine (niente crossfade) -->
+  <main class="panels">
+    <a class="panel" href="video-eventi.html" data-images="assets/video/poster/miu-miu-07-06-2024.jpg,assets/video/poster/video-evento-2.jpg,assets/video/poster/festa-50-anni-miar.jpg,assets/video/poster/video-evento-1.jpg,assets/video/poster/video-emozionale.jpg">
+      <span class="panel-title">Eventi</span>
+    </a>
+    <a class="panel" href="video-matrimoni.html" data-images="assets/video/poster/matrimonio-claudia-ivan-14-09-2024.jpg">
+      <span class="panel-title">Matrimoni</span>
+    </a>
+    <a class="panel" href="video-sport.html" data-images="assets/video/poster/au-piacenza-13-10-2024.jpg,assets/video/poster/day-1.jpg,assets/video/poster/au-alghero.jpg,assets/video/poster/cus-vs-au-08-12-2024.jpg,assets/video/poster/day-7.jpg">
+      <span class="panel-title">Sport</span>
+    </a>
   </main>
 
-  <footer class="site-footer">
-    <a class="logo-sc" href="index.html" aria-label="Torna alla home"><img src="assets/logo-sc.png" alt="Samuele Casabianca — logo"></a>
-    <span>Samuele Casabianca — Fotografo, Videomaker e Regista</span>
-  </footer>
+  <!-- Riga social sotto i pannelli: icone SVG inline (nessuna risorsa esterna) -->
+  <nav class="social-links" aria-label="Profili social">
+    <a class="social-link" href="https://www.instagram.com/ph.samuele/?hl=it" target="_blank" rel="noopener" aria-label="Instagram di Samuele Casabianca (si apre in una nuova scheda)">
+      <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+        <rect x="2" y="2" width="20" height="20" rx="5"/>
+        <circle cx="12" cy="12" r="4.2"/>
+        <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+      </svg>
+    </a>
+    <a class="social-link" href="https://www.linkedin.com/in/samuele-casabianca-0387b7237/" target="_blank" rel="noopener" aria-label="LinkedIn di Samuele Casabianca (si apre in una nuova scheda)">
+      <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+        <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/>
+        <rect x="2" y="9" width="4" height="12"/>
+        <circle cx="4" cy="4" r="2"/>
+      </svg>
+    </a>
+  </nav>
 
-  <script src="js/video-data.js"></script>
+  <script src="js/panels.js"></script>
   <script src="js/main.js"></script>
   <script>
-    document.getElementById('video-grid').innerHTML = VIDEO_DATA.map((v) => `
-      <a class="video-card" href="video-watch.html?v=${v.id}&cat=${v.categoria}" data-categoria="${v.categoria}">
-        ${videoThumbHtml(v)}
-        <div class="video-info">
-          <div class="video-title">${escapeHtml(v.titolo)}</div>
-          <div class="video-meta">${escapeHtml(v.canale)} · ${escapeHtml(v.durata)}</div>
-        </div>
-      </a>
-    `).join('');
-
-    // Filtro per categoria: nasconde/mostra le card con una transizione di opacity, senza ricaricare la pagina
-    const chips = document.querySelectorAll('#filter-chips .chip');
-    const cards = document.querySelectorAll('#video-grid .video-card');
-
-    chips.forEach((chip) => {
-      chip.addEventListener('click', () => {
-        chips.forEach((c) => c.classList.remove('is-active'));
-        chip.classList.add('is-active');
-
-        const filter = chip.dataset.filter;
-        cards.forEach((card) => {
-          const match = filter === 'tutti' || card.dataset.categoria === filter;
-          card.classList.toggle('is-filtered-out', !match);
-        });
-      });
-    });
+    initVerticalPanels();
   </script>
 </body>
 </html>

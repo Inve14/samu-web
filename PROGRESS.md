@@ -11,6 +11,12 @@ Nessun build step, nessuna dipendenza (eccetto Google Fonts caricati via CDN):
 - **Opzione 2** (consigliata): live server, es. `python3 -m http.server 8000`
   dalla root del progetto e aprire `http://localhost:8000`, oppure l'estensione
   Live Server di VS Code.
+- **Attenzione con `npx serve`**: di default fa i "clean URL" e reindirizza
+  `video-watch.html?v=12&cat=sport` a `/video-watch` **perdendo la query
+  string**, quindi ogni pagina di riproduzione mostra il primo video. È un
+  comportamento del server di sviluppo, non del sito (Vercel non ha un
+  `vercel.json` con `cleanUrls`). Per i test: `npx serve -l 8000 -c <file>` con
+  un `serve.json` fuori dal repo che contiene `{"cleanUrls": false}`.
 
 ## Stato attuale
 
@@ -22,7 +28,12 @@ Nessun build step, nessuna dipendenza (eccetto Google Fonts caricati via CDN):
 - [x] `index.html` — landing con 3 pannelli + hero con nome
 - [x] Sitemap con `lavoro.html` come hub (Foto / Streaming / Video) e `foto.html`
   con le 4 categorie fotografiche (vedi albero sotto)
-- [x] Pagine di navigazione a pannelli: `index.html` (3), `lavoro.html` (3), `foto.html` (4), `celebrazioni.html` (2)
+- [x] Pagine di navigazione a pannelli: `index.html` (3), `lavoro.html` (3), `foto.html` (4), `celebrazioni.html` (2), `video.html` (3)
+- [x] **Video a pannelli di categoria** (richiesta del cliente): `video.html` non è
+  più una griglia unica con filtri a chip ma 3 pannelli Eventi / Matrimoni / Sport,
+  identici a `foto.html`, che portano a 3 gallerie masonry
+  (`video-eventi.html`, `video-matrimoni.html`, `video-sport.html`) — vedi
+  "Video: da griglia con filtri a pannelli di categoria"
 - [x] ~~Storie video in stile Instagram al posto di Streaming/Video~~ — **valutate e
   accantonate su richiesta del cliente**: la versione resta nel branch
   `ristrutturazione-storie` — vedi "Storie in stile Instagram: valutate e accantonate"
@@ -38,7 +49,8 @@ Nessun build step, nessuna dipendenza (eccetto Google Fonts caricati via CDN):
 - [x] Splash screen di benvenuto sulla home (3 s, monogramma centrato, fade-out)
 - [x] Transizione animata tra pagine a pannelli (espansione in uscita + split in ingresso)
 - [x] Sezioni Streaming e Video in stile piattaforma (griglia + filtri + pagina di
-  riproduzione) — eliminate per le storie e poi **ripristinate** da `a3d555d`
+  riproduzione) — eliminate per le storie e poi **ripristinate** da `a3d555d`;
+  la griglia con filtri di Video è stata poi sostituita da pannelli + gallerie
 - [x] Foto reali inserite per Foto/Celebrazioni/Eventi Aziendali/Programmi TV/Sport Rugby,
   logo reale in nav/splash/footer, ritratto reale in `chi-sono.html` (vedi sezione
   "Immagini reali inserite" più sotto)
@@ -95,15 +107,19 @@ lavoro.html                     → 3 pannelli: Foto | Streaming | Video
 │   └── sport.html              → galleria diretta (come programmi-tv.html)
 ├── streaming.html               → griglia stile YouTube/Twitch (in costruzione lato contenuti)
 │   └── streaming-watch.html     → pagina di riproduzione (?v=ID)
-└── video.html                   → griglia stile YouTube con filtri categoria
-    └── video-watch.html         → pagina di riproduzione (?v=ID&cat=CATEGORIA)
+└── video.html                   → 3 pannelli: Eventi | Matrimoni | Sport (come foto.html)
+    ├── video-eventi.html        → galleria dei video 'eventi' (6)
+    ├── video-matrimoni.html     → galleria dei video 'matrimoni' (1)
+    └── video-sport.html         → galleria dei video 'sport' (15)
+        └── video-watch.html     → pagina di riproduzione (?v=ID&cat=CATEGORIA)
 ```
 
-Ogni breadcrumb interno riflette questo albero (es. "Lavoro / Foto / Sport / Rugby").
+Ogni breadcrumb interno riflette questo albero (es. "Lavoro / Foto / Sport",
+"Lavoro / Video / Sport", "Lavoro / Video / Sport / AU – Lecco").
 `index.html` e `chi-sono.html` continuano a puntare a `lavoro.html` (invariato come
 punto d'ingresso del "Mio Lavoro"). Il menu hamburger (`js/main.js`) riflette lo
 stesso albero: Il Mio Lavoro → Foto (con le 4 categorie annidate) / Streaming /
-Video.
+Video (con le 3 categorie annidate).
 
 > Una versione alternativa senza Foto/Streaming/Video, con i video come storie
 > dentro le gallerie, è stata valutata e accantonata: vedi "Storie in stile
@@ -115,7 +131,7 @@ Video.
 |---|---|
 | `index.html` | Landing: hero col nome + 3 pannelli (Chi Sono / Il Mio Lavoro / Contattami) — foto reali; crossfade su Chi Sono e Contattami, collage a scorrimento continuo (`panel--scroll`) su Il Mio Lavoro |
 | `chi-sono.html` | Pagina statica bio: ritratto reale (`assets/foto/chi-sono/profilo.jpg`) a sinistra, testo a destra |
-| `lavoro.html` | Hub, 3 pannelli: Foto (foto reali) / Streaming (placeholder) / Video (placeholder) |
+| `lavoro.html` | Hub, 3 pannelli: Foto (foto reali) / Streaming (placeholder) / Video (fotogrammi reali) |
 | `foto.html` | 4 pannelli, tutti con foto reali: Programmi TV / Celebrazioni / Eventi / Sport |
 | `celebrazioni.html` | 2 pannelli con foto reali: Matrimoni / Feste Private |
 | `eventi.html` | Galleria diretta — 50 foto reali (ex Aziendali/Brand/Gala unite) |
@@ -125,14 +141,17 @@ Video.
 | `celebrazioni-feste-private.html` | Galleria — 28 foto reali |
 | `streaming.html` | Griglia stile YouTube/Twitch, 10 card placeholder (dati da `js/video-data.js`) |
 | `streaming-watch.html` | Pagina di riproduzione streaming (player placeholder + correlati), legge `?v=ID` |
-| `video.html` | Griglia stile YouTube con filtri Tutti/Eventi/Matrimoni/Sport, **22 card reali** (6 eventi, 1 matrimoni, 15 sport) |
-| `video-watch.html` | Pagina di riproduzione video: **`<video controls>` reale** + correlati, legge `?v=ID&cat=CATEGORIA` |
+| `video.html` | 3 pannelli come `foto.html`: Eventi / Matrimoni / Sport, con i fotogrammi di copertina di ogni categoria |
+| `video-eventi.html` | Galleria masonry video — 6 video (generata da `VIDEO_DATA`) |
+| `video-matrimoni.html` | Galleria masonry video — 1 video (generata da `VIDEO_DATA`) |
+| `video-sport.html` | Galleria masonry video — 15 video (generata da `VIDEO_DATA`) |
+| `video-watch.html` | Pagina di riproduzione video: **`<video controls>` reale** + correlati, legge `?v=ID&cat=CATEGORIA`; breadcrumb "Lavoro / Video / Categoria / Titolo" |
 | `contattami.html` | Form contatti (mailto:) + email/Instagram/LinkedIn |
 | `css/style.css` | Tutto lo stile; variabili tema in `:root` in cima al file |
 | `js/panels.js` | `initVerticalPanels()`: crossfade slide solo-hover, collage `panel--scroll`, inquadratura per foto e `data-src` in `data-images`, transizioni animate tra pagine a pannelli |
-| `js/main.js` | Menu hamburger overlay, lightbox galleria, form mailto (auto-init su DOMContentLoaded) + helper condivisi delle sezioni video (`escapeHtml`, `videoThumbHtml`, `videoPlayerHtml`) |
+| `js/main.js` | Menu hamburger overlay, lightbox galleria, form mailto, gallerie video (`initVideoGallery`) — tutto in auto-init su DOMContentLoaded — + helper condivisi delle sezioni video (`escapeHtml`, `videoThumbHtml`, `videoPlayerHtml`) |
 | `js/splash.js` | Splash screen di benvenuto (incluso solo in `index.html`); anima il logo dallo splash alla nav (FLIP) all'uscita |
-| `js/video-data.js` | Dataset condiviso da `streaming.html`/`streaming-watch.html`/`video.html`/`video-watch.html`: `VIDEO_DATA` con i 22 video reali, `STREAM_DATA` ancora placeholder |
+| `js/video-data.js` | Dataset condiviso da `streaming.html`/`streaming-watch.html`, dalle 3 gallerie video e da `video-watch.html`: `VIDEO_DATA` con i 22 video reali, `VIDEO_CATEGORIE` (nome e pagina galleria di ogni categoria), `STREAM_DATA` ancora placeholder |
 | `assets/favicon/` | Favicon generate da `assets/logo-sc.png` (16, 32, apple-touch 180, 512) — vedi "Favicon" |
 | `assets/logo-sc.png` | Logo reale (ritagliato/ricolorato da `immagini/`), usato in nav/splash/footer |
 | `assets/foto/` | Foto reali ottimizzate per il web (ridimensionate/compresse dagli originali in `immagini/`), organizzate per categoria — vedi "Immagini reali inserite"; `contattami/` contiene le due immagini del pannello Contattami |
@@ -1161,6 +1180,10 @@ telefono al computer, cambia la densità (numero di colonne), non il carattere.
 
 ### Griglie video (`video.html`, `streaming.html`)
 
+> *Superato per `video.html`*: la griglia unica con filtri è stata sostituita da
+> pannelli + gallerie, vedi "Video: da griglia con filtri a pannelli di
+> categoria". Il principio (forma del riquadro dal campo `verticale`) è rimasto.
+
 - `.video-grid` passa da griglia uniforme (`grid`, card 16:9 identiche) a
   **mosaico a colonne come le gallerie** (`columns`, card con
   `break-inside: avoid`): 4 colonne, 3 sotto i 1100px, 2 sotto i 560px.
@@ -1210,6 +1233,174 @@ non hanno più etichetta; resta il bordo tratteggiato.
 - **Non verificato**: telefoni reali (tocco vero su schermo touch), Safari e
   Firefox.
 
+## Video: da griglia con filtri a pannelli di categoria
+
+**Richiesta del cliente**: la sezione Video deve avere la stessa struttura e lo
+stesso stile di Foto. Niente più griglia unica con i filtri a chip
+(Tutti / Eventi / Matrimoni / Sport): pannelli per categoria che portano a
+gallerie.
+
+```
+PRIMA                                      DOPO
+video.html  → griglia di 22 card           video.html  → 3 pannelli (come foto.html)
+              + chip di filtro             ├── video-eventi.html     → galleria (6)
+└── video-watch.html                       ├── video-matrimoni.html  → galleria (1)
+                                           └── video-sport.html      → galleria (15)
+                                               └── video-watch.html?v=ID&cat=CATEGORIA
+```
+
+### `video.html`: pagina a pannelli
+
+- **Costruita da `foto.html`**, non riscritta: stesso file con titolo,
+  breadcrumb ("Lavoro / Video") e pannelli cambiati — `diff foto.html
+  video.html` mostra solo quelle righe. Stessa nav trasparente, stessa riga
+  social, stessi script (`panels.js` + `initVerticalPanels()`), quindi
+  crossfade in hover, ingresso a split e uscita a espansione sono gli stessi.
+- **`data-images`**: solo fotogrammi di `assets/video/poster/` della categoria
+  del pannello.
+  - Eventi: Miu Miu (verticale, a riposo), Video Evento 2, Festa 50 Anni Miar,
+    Video Evento 1, Video Emozionale. Escluso IKEA (vedi poster sotto, scelta
+    fatta quando il suo poster aveva ancora le fasce nere).
+  - Matrimoni: **un solo fotogramma**, perché c'è un solo video. Con una sola
+    immagine `panels.js` non attiva il crossfade (serve più di una slide):
+    resta l'allargamento in hover, come sugli altri pannelli.
+  - Sport: Piacenza (a riposo), Day 1, Alghero, CUS vs AU, Day 7 (scartato
+    Derby AU – CUS: fotogramma mosso).
+
+### Le tre gallerie video
+
+- **Pagine**: `video-eventi.html`, `video-matrimoni.html`, `video-sport.html`,
+  costruite sul modello di `sport.html` (nav `site-nav--solid`, intestazione,
+  footer). Breadcrumb **"Lavoro / Video / Eventi"** ecc., con "Video" cliccabile.
+- **Card generate, non scritte a mano**: il contenitore è
+  `<div class="masonry masonry--video" data-video-categoria="sport">` e
+  `initVideoGallery()` (in `js/main.js`, auto-init come lightbox e menu) lo
+  riempie con le voci di `VIDEO_DATA` di quella categoria. **Un video aggiunto
+  al dataset compare da solo** nella galleria giusta. Categoria senza video →
+  "Video in arrivo."; voce senza `poster` → segnaposto `.ph` col titolo.
+- **Stesso stile delle foto**: è la stessa `.masonry` (CSS `columns`), e
+  `.video-tile` condivide con `.masonry-item` margini, angoli, zoom e ombra in
+  hover (stesse regole CSS, selettori raggruppati).
+- **Forma dal contenuto**: ogni riquadro ha `aspect-ratio` 9:16 se il video è
+  `verticale`, altrimenti 16:9 — la stessa proporzione del poster, quindi la
+  miniatura (`object-fit: cover`) lo riempie senza fasce e senza tagli.
+  Conseguenza: Eventi è irregolare (1 verticale + 5 orizzontali), **Sport è
+  regolare perché tutti i 15 video sono verticali** — l'irregolarità nasce dal
+  contenuto vero, non viene inventata.
+- **Ogni riquadro**: miniatura, indicatore di riproduzione (cerchio con
+  triangolo, dorato in hover/focus) e durata in basso a destra. È un
+  `<a href="video-watch.html?v=ID&cat=CATEGORIA">`: nome accessibile = titolo
+  (`alt`) + durata. Niente titolo visibile, come le foto.
+- **Colonne**: 4, 3 sotto i 1100px, 2 sotto i 560px (le foto ne hanno 3/2).
+  Una colonna in più perché a 3 colonne un 9:16 sarebbe alto ~800px, più dello
+  schermo. Le regole responsive usano `.masonry.masonry--video` per non farsi
+  portare a 2 colonne dalla regola `.masonry` dei 900px.
+- **Un solo video** (Matrimoni): con 4 colonne starebbe in un quarto della
+  pagina. `initVideoGallery()` aggiunge `.is-single` → una colonna, larghezza
+  massima 960px (400px se verticale): 960x540 a 1440x900, 343x193 a 375x800.
+- **Nessun lightbox**: i riquadri non sono `.masonry-item`, quindi
+  `initLightbox()` non li vede e non inietta nemmeno il suo markup.
+- **Nessun video scaricato**: nessun `<video>` nelle gallerie, solo `<img
+  loading="lazy">` dei poster.
+
+### `video-watch.html`
+
+Invariata tranne il breadcrumb, che ora ha il livello della categoria:
+**"Lavoro / Video / Sport / AU – Lecco"**, con "Sport" → `video-sport.html`. È
+anche il link di ritorno: la pagina non aveva (e non ha) un altro link "torna
+indietro", il ritorno alla vecchia griglia era il "Video" del breadcrumb. La
+categoria viene dal dataset (`VIDEO_CATEGORIE[current.categoria]`, in
+`js/video-data.js`), non da `?cat=`: un link con la categoria sbagliata non
+porta alla galleria sbagliata.
+
+### Menu hamburger
+
+Sotto Video sono annidate Eventi / Matrimoni / Sport (`menu-sub menu-sub2`), come
+le categorie sotto Foto. Con 14 voci il menu non stava più in altezza su
+schermi bassi e la parte alta veniva tagliata senza poterci arrivare: ora
+l'overlay scorre (vedi "Menu mobile" in "Decisioni prese").
+
+### Poster di "Videoriassunto Evento IKEA" sostituito
+
+Il poster (estratto a suo tempo con QuickLook, che prende l'inizio della clip)
+aveva **fasce nere sopra e sotto** (72 + 71 px su 720): il video comincia con
+un'apertura in formato cinema. Campionato il video in più punti: a 5 s le fasce
+ci sono, a 25/45/65/80 s no — il resto del video è a tutto quadro. Il poster è
+stato rigenerato da un fotogramma a **30 s** (palco con relatori e pubblico),
+estratto con AVFoundation (`AVAssetImageGenerator`, script Swift usa e getta:
+`ffmpeg` non c'è) e passato per la stessa pipeline degli altri (thumbnail 1280px
+Lanczos, JPEG q82): 1280x720, 114 KB, stesso nome file. Gli altri 21 poster sono
+stati controllati riga per riga: nessuna fascia.
+
+### Pulizia
+
+- CSS rimasto senza uso, rimosso: `.filter-chips`, `.chip`,
+  `.video-card.is-filtered-out`. `.video-grid`/`.video-card`/`.video-thumb`
+  restano (li usano `streaming.html` e i correlati di `video-watch.html`).
+- Commenti di `js/video-data.js` e `js/main.js` aggiornati; `README.md`
+  aggiornato.
+- Breadcrumb: la voce corrente, se non c'è spazio, si accorcia con i puntini
+  invece di essere tagliata a metà lettera. Verificato confrontando le stesse
+  pagine con e senza la regola: lo spazio occupato è identico, cambia solo il
+  "…".
+
+### Verifiche fatte in browser (Chrome, `npx serve -l 8000` senza clean URL)
+
+La finestra reale era 1360x561 (poi bloccata a 400x474 dallo strumento): il
+percorso a click è stato fatto nella finestra reale, le misure a 1440x900 e
+375x800 in iframe di quelle dimensioni sulla stessa origine.
+
+- **Percorso con click veri**: home → Il Mio Lavoro ("Lavoro") → Video
+  ("Lavoro / Video") → Sport ("Lavoro / Video / Sport") → un riquadro →
+  `video-watch.html?v=12&cat=sport` ("Lavoro / Video / Sport / AU – Piacenza —
+  13 ottobre 2024"), video avviato con un click sul comando play: avanza
+  (`currentTime` 2,94 s dopo 3 s, `readyState` 4), durata 90,6 s = 1:31 come nel
+  dataset. Click su "Sport" nel breadcrumb → torna a `video-sport.html`.
+  Breadcrumb anche per v=7 (Matrimoni) e v=6 (Eventi); `?v=3&cat=sport` mostra
+  comunque "Eventi" (la categoria vera).
+- **Animazioni di `video.html`**: uscita da `lavoro.html` (clone che si espande
+  dal pannello Video) e da `video.html` verso Sport; ingresso a split con
+  stagger visto a schermo, poi 0 `.panel--closed`, 0 cover, nessun
+  `panels--entering` residuo. Crossfade: in hover su Eventi la slide cambia
+  (Miu Miu → Video Evento 2) e il pannello va a `flex-grow` 1.6; uscito il
+  mouse si ferma sulla slide corrente; idem su Sport.
+- **`video.html` = `foto.html`** (misurato): stessa nav, contenitore
+  32,64 → 1376x748 a 1440x900 (pagina alta 900, nessuno scroll), raggio 18px,
+  titoli 31,68px, riga social a 812–900; a 375x800 stessi margini (16px),
+  pannelli 343x240, riga social subito dopo l'ultimo. Unica differenza: 3
+  pannelli larghi 448 invece di 4 da 332.
+- **Gallerie**: Eventi 6 (1 verticale 322x572 + 5 orizzontali 322x181 a 1440;
+  168x298 / 168x94 a 375), Matrimoni 1 (960x540 / 343x193), Sport 15 (tutti
+  verticali). 4 colonne a 1440, 2 a 375. **0 riquadri con proporzione diversa
+  dal poster**, 0 immagini rotte, durate corrette, 15/15 `loading="lazy"`.
+- **Nessun MP4 scaricato** (scheda Network, tutte e 3 le gallerie): solo HTML,
+  CSS, JS, logo, font e poster (15 / 6 / 1); 0 `<video>` nel DOM.
+- **Lightbox foto non toccato**: `celebrazioni-feste-private.html`, click →
+  3/28, avanti → 4/28, ESC chiude; nelle gallerie video 0 lightbox iniettati.
+- **Menu**: albero letto dal DOM (Video → Eventi/Matrimoni/Sport → pagine
+  giuste); a 561px di altezza scorre e "Home" è raggiungibile.
+- **Link**: 295 riferimenti locali unici (tutte le pagine, menu, `VIDEO_DATA`,
+  `VIDEO_CATEGORIE`) + i 22 `video-watch.html?v=…&cat=…` generati, controllati
+  via HTTP: **nessuno rotto**.
+- **Console**: nessun messaggio sulle 20 pagine (sonda `console.error` usata
+  per confermare che il tracciamento funzionasse).
+- **Scroll orizzontale**: nessuno, a 1440 e a 375, su tutte le 20 pagine.
+- Fallback provati modificando il dataset solo in memoria: voce senza poster
+  (segnaposto che riempie il riquadro) e categoria vuota ("Video in arrivo.").
+- **Non verificato**: Safari/Firefox, telefoni reali (tocco), uno schermo
+  fisico a 1440x900; screenshot a 375 solo a bassa risoluzione (forma e
+  impaginazione visibili, dettagli fini no).
+
+### Problemi trovati e non risolti (preesistenti, fuori da questo passaggio)
+
+- **Il menu hamburger non si chiude con la X**: l'overlay (`z-index: 200`) sta
+  sopra la nav (`100`), quindi l'hamburger/X non riceve il click. Si chiude solo
+  con ESC o scegliendo una voce — su telefono, di fatto, solo scegliendo una voce.
+- **Breadcrumb su telefono**: a 375px ha ~208px. Nelle pagine più profonde
+  ("Lavoro / Foto / Celebrazioni / Matrimoni") anche i livelli superiori escono
+  dallo spazio; in `video-watch.html` del titolo resta solo l'iniziale con "…"
+  (il titolo completo è comunque l'`<h1>` sotto il player).
+
 ## Deploy
 
 Il sito è **online su https://samuelecasabianca.com**.
@@ -1223,8 +1414,8 @@ Il sito è **online su https://samuelecasabianca.com**.
 - **Cosa non sta nel repo** (vedi `.gitignore`): gli originali di `immagini/`,
   tutti i file `.mp4` e i PDF. **I video esistono solo in locale** in
   `assets/video/`: `js/video-data.js` punta a quei file, quindi **sul sito
-  pubblicato le pagine `video-watch.html` non riproducono nulla** (griglia e
-  miniature invece funzionano, i poster sono nel repo) finché i video non vengono
+  pubblicato le pagine `video-watch.html` non riproducono nulla** (pannelli,
+  gallerie e miniature invece funzionano, i poster sono nel repo) finché i video non vengono
   caricati altrove e i `src` aggiornati.
 - **Dove caricarli**: `video-watch.html` usa un `<video controls>` HTML, quindi
   basta un hosting di file MP4 diretti con supporto alle richieste Range (es.
@@ -1466,9 +1657,15 @@ passare al successivo).
   `<img>`, il lightbox mostra l'immagine (supporta `data-full` per la versione
   ad alta risoluzione); altrimenti replica il placeholder.
 - **Menu mobile**: overlay a schermo intero iniettato da `js/main.js` (per non
-  duplicare il markup in 16 pagine), aperto dall'hamburger presente in ogni nav.
+  duplicare il markup in tutte le pagine), aperto dall'hamburger presente in ogni nav.
+  Con 14 voci (categorie di Foto e di Video annidate) può essere più alto dello
+  schermo: l'overlay scorre e il centraggio è fatto con i margini automatici di
+  prima e ultima voce, non con `justify-content: center` (che taglierebbe la
+  parte alta senza poterci arrivare).
 - **Breadcrumb**: nella nav fissa di ogni pagina interna, con link ai livelli
-  superiori (es. "Lavoro / Celebrazioni / Matrimoni"; vedi "Sitemap").
+  superiori (es. "Lavoro / Foto / Celebrazioni / Matrimoni"; vedi "Sitemap").
+  Se manca spazio si accorcia solo la voce corrente, con i puntini
+  (`text-overflow: ellipsis`); i livelli superiori restano interi.
 - **Pagine galleria generate da template**: le 9 pagine foglia condividono la
   stessa struttura (cambiano titolo, breadcrumb, descrizione e numero di
   placeholder). Se serve modificarle tutte, conviene farlo con un
@@ -1488,7 +1685,7 @@ passare al successivo).
   corrispondere alle rispettive `transition`/`animation` CSS).
 - **Transizione tra pagine a pannelli**: gestita da `initVerticalPanels()` in
   `js/panels.js`, quindi attiva automaticamente su tutte le pagine a pannelli
-  (index, lavoro, foto, celebrazioni — eventi e sport sono diventate gallerie). Stili nella sezione
+  (index, lavoro, foto, celebrazioni, video — eventi e sport sono diventate gallerie). Stili nella sezione
   `/* === Transizioni pannelli === */` di `css/style.css`. Due metà:
   - **Uscita**: al click su un pannello il JS fa `preventDefault()`, crea un
     clone visivo (`.panel-expander`, `position: fixed` sul rettangolo del
@@ -1511,26 +1708,27 @@ passare al successivo).
     navigazione è immediata. Le pagine galleria (foglie) non hanno animazione
     d'ingresso: ricevono la normale navigazione dopo l'espansione del pannello
     genitore.
-- **Sezioni Streaming e Video** (`streaming.html`, `video.html` +
-  `streaming-watch.html`, `video-watch.html`): non usano il componente
-  pannelli, ma un mosaico a colonne di card (`.video-grid` / `.video-card`),
-  con riquadro 9:16 o 16:9 secondo il campo `verticale` e titolo/canale/durata
-  sotto (vedi "Mosaico anche su telefono, per foto e video").
+- **Sezioni Streaming e Video**: `streaming.html` è un mosaico a colonne di
+  card (`.video-grid` / `.video-card`), con riquadro 9:16 o 16:9 secondo il
+  campo `verticale` e titolo/canale/durata sotto (vedi "Mosaico anche su
+  telefono, per foto e video"). **Video** invece è organizzato come Foto:
+  `video.html` a pannelli e tre gallerie masonry (`.masonry--video` /
+  `.video-tile`), vedi "Video: da griglia con filtri a pannelli di categoria".
   - **Dataset condiviso**: `js/video-data.js` espone due array globali,
     `STREAM_DATA` e `VIDEO_DATA` (oggetti `{ id, titolo, categoria, canale,
     durata, descrizione }`, `categoria` solo sui video). Le quattro pagine lo
     includono e leggono solo da lì — **quando arriveranno i contenuti reali,
     basta sostituire questi due array** (e collegare l'url/embed del player al
     posto del placeholder), nessun'altra modifica a HTML necessaria.
-  - **Griglie** (`streaming.html`/`video.html`): la griglia viene generata da
-    uno script inline che mappa il dataset in card `<a class="video-card"
-    href="…-watch.html?v=ID(&cat=CATEGORIA)">`. In `video.html` le card hanno
-    anche `data-categoria`.
-  - **Filtro categoria** (solo `video.html`): chip `.chip` (Tutti / Eventi /
-    Matrimoni / Sport); al click aggiunge `.is-filtered-out` alle card non
-    corrispondenti — filtro client-side, nessuna ricarica pagina. Con il mosaico
-    la classe è `display: none` (prima era una dissolvenza a `opacity: 0`, che
-    in un layout a colonne lascerebbe buchi alti quanto un video verticale).
+  - **Griglia** (`streaming.html`): generata da uno script inline che mappa il
+    dataset in card `<a class="video-card" href="streaming-watch.html?v=ID">`.
+  - **Gallerie video** (`video-eventi/matrimoni/sport.html`): generate da
+    `initVideoGallery()` in `js/main.js`, che filtra `VIDEO_DATA` per il
+    `data-video-categoria` del contenitore.
+  - ~~**Filtro categoria** con chip `.chip` in `video.html`~~ — **rimosso**: su
+    richiesta del cliente la separazione per categoria ora la fanno i pannelli
+    di `video.html`. CSS `.filter-chips`, `.chip` e `.video-card.is-filtered-out`
+    eliminato.
   - **Pagine di riproduzione** (`streaming-watch.html`/`video-watch.html`):
     layout a due colonne `.watch-layout` (player + info a sinistra, correlati
     `.watch-related-list` a destra; a una colonna sotto i 900px). Leggono
@@ -1545,7 +1743,7 @@ passare al successivo).
     solo il contenuto video reale.
 - **Classi CSS principali**: `.panels`/`.panel`/`.panel-title`/`.panel-slides`/
   `.panel-slide`, `.panel-montage` (collage a scorrimento), `.social-links`/`.social-link`, `.masonry`/`.masonry-item`,
-  `.video-grid`/`.video-card`, `.watch-layout`, `.chip`, `.ph` (placeholder foto generico), `.site-nav`,
+  `.masonry--video`/`.video-tile` (gallerie video), `.video-grid`/`.video-card`, `.watch-layout`, `.ph` (placeholder foto generico), `.site-nav`,
   `.lightbox`, `.mobile-menu`, `.btn`.
 
 ## Placeholder ancora da sostituire

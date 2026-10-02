@@ -1,15 +1,17 @@
 /* ==========================================================================
    video-data.js — dataset condiviso dalle pagine Streaming e Video
-   (streaming.html, streaming-watch.html, video.html, video-watch.html).
+   (streaming.html, streaming-watch.html, le gallerie video-eventi.html,
+   video-matrimoni.html, video-sport.html e video-watch.html).
 
-   Le pagine leggono solo questi due array: per aggiungere o togliere un
-   contenuto non serve nessun'altra modifica a HTML o JS.
+   Le pagine leggono solo questi array: per aggiungere o togliere un
+   contenuto non serve nessun'altra modifica a HTML o JS (un video nuovo
+   compare da solo nella galleria della sua categoria).
 
    Campi di ogni voce:
      id           numero univoco (dentro il proprio array), usato in ?v=ID
      titolo       titolo leggibile mostrato nella griglia e nel player
      categoria    solo VIDEO_DATA: 'eventi' | 'matrimoni' | 'sport'
-                  (deve combaciare con i data-filter dei chip in video.html)
+                  (deve essere una chiave di VIDEO_CATEGORIE, in fondo al file)
      canale       etichetta mostrata nei meta
      durata       'M:SS', letta dall'atomo mvhd del file MP4
      verticale    true se il file è girato in verticale (9:16): il player e la
@@ -66,3 +68,13 @@ const VIDEO_DATA = [
   { id: 21, titolo: 'Day 7', categoria: 'sport', canale: 'Samuele Casabianca', durata: '1:30', verticale: true, src: 'assets/video/sport/day-7.mp4', poster: 'assets/video/poster/day-7.jpg', descrizione: 'Video sportivo realizzato da Samuele Casabianca.' },
   { id: 22, titolo: 'Derby AU – CUS', categoria: 'sport', canale: 'Samuele Casabianca', durata: '0:59', verticale: true, src: 'assets/video/sport/derby-au-cus.mp4', poster: 'assets/video/poster/derby-au-cus.jpg', descrizione: 'Video sportivo realizzato da Samuele Casabianca.' },
 ];
+
+/* Categorie di VIDEO_DATA: nome mostrato e pagina galleria della categoria
+   (usati dal breadcrumb di video-watch.html). Una categoria nuova richiede
+   la sua voce qui, una pagina galleria con data-video-categoria uguale alla
+   chiave e un pannello in video.html. */
+const VIDEO_CATEGORIE = {
+  eventi: { nome: 'Eventi', pagina: 'video-eventi.html' },
+  matrimoni: { nome: 'Matrimoni', pagina: 'video-matrimoni.html' },
+  sport: { nome: 'Sport', pagina: 'video-sport.html' },
+};

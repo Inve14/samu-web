@@ -170,8 +170,19 @@ button {
   color: var(--color-text);
 }
 
+/* I livelli superiori restano interi; se manca spazio (es. titolo di un video
+   in video-watch.html su telefono) si accorcia solo la voce corrente, con i
+   puntini invece di un taglio a metà lettera */
+.breadcrumb > * {
+  flex-shrink: 0;
+}
+
 .breadcrumb span[aria-current] {
   color: var(--color-text);
+  flex-shrink: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .breadcrumb .sep {
@@ -240,11 +251,25 @@ button {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
   gap: var(--space-sm);
+  /* Con le categorie di Foto e di Video le voci sono 14: su schermi bassi
+     (telefono in orizzontale) non stanno in altezza. Il menu scorre, e il
+     centraggio verticale è fatto con i margini automatici della prima e
+     dell'ultima voce invece che con justify-content: center, che taglierebbe
+     la parte alta rendendola irraggiungibile. */
+  overflow-y: auto;
+  padding: var(--nav-height) var(--space-sm);
   opacity: 0;
   visibility: hidden;
   transition: opacity var(--transition-fast), visibility var(--transition-fast);
+}
+
+.mobile-menu > :first-child {
+  margin-top: auto;
+}
+
+.mobile-menu > :last-child {
+  margin-bottom: auto;
 }
 
 .mobile-menu.is-open {
@@ -600,7 +625,10 @@ button {
   column-gap: var(--space-sm);
 }
 
-.masonry-item {
+/* .video-tile (gallerie video) condivide l'aspetto delle foto: stesso ritmo,
+   stessi angoli, stesso zoom in hover */
+.masonry-item,
+.video-tile {
   break-inside: avoid;
   margin-bottom: var(--space-sm);
   cursor: pointer;
@@ -609,7 +637,9 @@ button {
   transition: transform var(--transition-fast), box-shadow var(--transition-fast);
 }
 
-.masonry-item:hover {
+.masonry-item:hover,
+.video-tile:hover,
+.video-tile:focus-visible {
   transform: scale(1.03);
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
 }
@@ -724,38 +754,107 @@ button {
    Sezioni Streaming e Video (stile piattaforma video)
    ========================================================================== */
 
-/* Chip di filtro (solo video.html) */
-.filter-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.6rem;
-  margin-bottom: var(--space-md);
+/* Gallerie video (video-eventi.html, video-matrimoni.html, video-sport.html):
+   la stessa .masonry delle foto, con riquadri generati da initVideoGallery()
+   in js/main.js. Ogni riquadro ha la proporzione del suo video (campo
+   `verticale` → 9:16, altrimenti 16:9), uguale a quella del poster: la
+   miniatura lo riempie (cover) senza fasce né tagli, e l'irregolarità del
+   mosaico nasce dal contenuto. Una colonna in più delle foto (4 → 3 → 2, vedi
+   "Responsive"): a 3 colonne un video verticale sarebbe più alto dello schermo. */
+.masonry--video {
+  columns: 4;
 }
 
-.chip {
-  padding: 0.5rem 1.2rem;
-  border: 1px solid #2c2c33;
-  border-radius: 999px;
-  font-family: var(--font-body);
-  font-size: 0.8rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--color-text-muted);
-  transition: color var(--transition-fast), border-color var(--transition-fast),
-    background var(--transition-fast);
+.video-tile {
+  position: relative;
+  display: block;
+  aspect-ratio: 16 / 9;
+  background: #000;
 }
 
-.chip:hover {
-  color: var(--color-text);
+.video-tile.is-vertical {
+  aspect-ratio: 9 / 16;
 }
 
-.chip.is-active {
-  color: var(--color-bg);
+.video-tile img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Voce senza poster: il segnaposto riempie il riquadro */
+.video-tile .ph {
+  height: 100%;
+  padding: var(--space-sm);
+  text-align: center;
+}
+
+/* Indicatore di riproduzione: cerchio con triangolo, dorato in hover */
+.video-tile-play {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 3.25rem;
+  height: 3.25rem;
+  transform: translate(-50%, -50%);
+  border: 1px solid rgba(242, 242, 240, 0.75);
+  border-radius: 50%;
+  background: rgba(14, 14, 16, 0.55);
+  transition: background var(--transition-fast), border-color var(--transition-fast);
+}
+
+.video-tile-play::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 54%;
+  transform: translate(-50%, -50%);
+  border-style: solid;
+  border-width: 0.55rem 0 0.55rem 0.9rem;
+  border-color: transparent transparent transparent var(--color-text);
+}
+
+.video-tile:hover .video-tile-play,
+.video-tile:focus-visible .video-tile-play {
   background: var(--color-accent);
   border-color: var(--color-accent);
 }
 
-/* Griglia di card (streaming.html, video.html): mosaico a colonne come la
+.video-tile-duration {
+  position: absolute;
+  right: 0.5rem;
+  bottom: 0.5rem;
+  padding: 0.15rem 0.45rem;
+  border-radius: var(--radius);
+  background: rgba(14, 14, 16, 0.8);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text);
+}
+
+/* Un solo video (oggi Matrimoni): una colonna, con un tetto di larghezza che
+   tiene il riquadro dentro lo schermo (più stretto se il video è verticale).
+   Selettore rafforzato: deve vincere anche sul numero di colonne responsive. */
+.masonry.masonry--video.is-single {
+  columns: 1;
+}
+
+.masonry--video.is-single .video-tile {
+  max-width: 960px;
+}
+
+.masonry--video.is-single .video-tile.is-vertical {
+  max-width: 400px;
+}
+
+.video-gallery-empty {
+  color: var(--color-text-muted);
+}
+
+/* Griglia di card (streaming.html): mosaico a colonne come la
    masonry delle gallerie, non una griglia uniforme. L'irregolarità viene
    dalla forma vera del contenuto: ogni miniatura ha la proporzione del suo
    video (campo `verticale` del dataset → 9:16, altrimenti 16:9). Stesso
@@ -770,12 +869,6 @@ button {
   display: block;
   break-inside: avoid;
   margin-bottom: var(--space-md);
-}
-
-/* Filtro categoria: la card esce dal mosaico (non resta un buco trasparente,
-   che in un layout a colonne lascerebbe vuoti alti quanto un video verticale) */
-.video-card.is-filtered-out {
-  display: none;
 }
 
 .video-thumb {
@@ -1435,6 +1528,12 @@ button {
   .video-grid {
     columns: 3;
   }
+
+  /* Gallerie video: 3 colonne fino al telefono (la regola .masonry a 900px
+     sotto le porterebbe a 2 troppo presto) */
+  .masonry.masonry--video {
+    columns: 3;
+  }
 }
 
 @media (max-width: 900px) {
@@ -1530,8 +1629,28 @@ button {
     column-gap: var(--space-xs);
   }
 
-  .masonry-item {
+  .masonry-item,
+  .video-tile {
     margin-bottom: var(--space-xs);
+  }
+
+  .masonry.masonry--video {
+    columns: 2;
+  }
+
+  .video-tile-play {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+
+  .video-tile-play::before {
+    border-width: 0.45rem 0 0.45rem 0.72rem;
+  }
+
+  .video-tile-duration {
+    right: 0.35rem;
+    bottom: 0.35rem;
+    font-size: 0.68rem;
   }
 
   .video-grid {

@@ -22,6 +22,9 @@
       <span class="sep">/</span>
       <a href="video.html">Video</a>
       <span class="sep">/</span>
+      <!-- Categoria del video: link alla sua galleria, impostato da JS -->
+      <a href="video.html" id="breadcrumb-cat">Video</a>
+      <span class="sep">/</span>
       <span aria-current="page" id="breadcrumb-title">Video</span>
     </nav>
     <div class="nav-right">
@@ -65,6 +68,19 @@
     document.getElementById('watch-meta').textContent = `${current.canale} · ${current.durata}`;
     document.getElementById('watch-description').textContent = current.descrizione;
     document.getElementById('breadcrumb-title').textContent = current.titolo;
+
+    // Breadcrumb "Lavoro / Video / Categoria / Titolo": la categoria riporta
+    // alla galleria da cui si arriva. Viene dal dataset, non da ?cat=, così un
+    // link con la categoria sbagliata non porta alla galleria sbagliata.
+    const categoryLink = document.getElementById('breadcrumb-cat');
+    const category = VIDEO_CATEGORIE[current.categoria];
+    if (category) {
+      categoryLink.textContent = category.nome;
+      categoryLink.href = category.pagina;
+    } else {
+      categoryLink.nextElementSibling.remove(); // separatore
+      categoryLink.remove();
+    }
     document.title = `${current.titolo} — Samuele Casabianca`;
 
     // Video correlati: prima quelli della stessa categoria, poi gli altri

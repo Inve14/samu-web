@@ -24,6 +24,9 @@ function initMobileMenu() {
     <a class="menu-sub menu-sub2" href="sport.html">Sport</a>
     <a class="menu-sub" href="streaming.html">Streaming</a>
     <a class="menu-sub" href="video.html">Video</a>
+    <a class="menu-sub menu-sub2" href="video-eventi.html">Eventi</a>
+    <a class="menu-sub menu-sub2" href="video-matrimoni.html">Matrimoni</a>
+    <a class="menu-sub menu-sub2" href="video-sport.html">Sport</a>
     <a href="contattami.html">Contattami</a>
   `;
   document.body.appendChild(menu);
@@ -147,8 +150,9 @@ function initContactForm() {
 }
 
 /* ---------- Sezioni Streaming e Video ----------
-   Helper condivisi da streaming.html, video.html e dalle rispettive pagine
-   `-watch.html`, che leggono STREAM_DATA / VIDEO_DATA (js/video-data.js).
+   Helper condivisi da streaming.html, dalle gallerie video (video-eventi,
+   video-matrimoni, video-sport) e dalle pagine `-watch.html`, che leggono
+   STREAM_DATA / VIDEO_DATA (js/video-data.js).
    Ogni voce senza `src`/`poster` ricade sul segnaposto, così le pagine
    funzionano sia con i contenuti reali sia in attesa che arrivino. */
 
@@ -196,9 +200,49 @@ function videoPlayerHtml(v) {
     </div>`;
 }
 
+/* Galleria video di una categoria (video-eventi.html, video-matrimoni.html,
+   video-sport.html): i riquadri sono generati da VIDEO_DATA filtrato per il
+   `data-video-categoria` del contenitore, quindi un video aggiunto al dataset
+   compare da solo. Stessa masonry delle gallerie fotografiche; la forma di
+   ogni riquadro viene dal campo `verticale` (9:16 o 16:9, come il poster), da
+   cui nasce l'impaginazione irregolare. Gli elementi sono link a
+   video-watch.html, non `.masonry-item`: il lightbox non li intercetta.
+   Solo miniature con `loading="lazy"`: aprendo la galleria non si scarica
+   nessun video. */
+function initVideoGallery() {
+  const gallery = document.querySelector('[data-video-categoria]');
+  if (!gallery || typeof VIDEO_DATA === 'undefined') return;
+
+  const categoria = gallery.dataset.videoCategoria;
+  const videos = VIDEO_DATA.filter((v) => v.categoria === categoria);
+
+  // Con un solo video (oggi Matrimoni) una colonna su quattro lascerebbe la
+  // pagina vuota a destra: il riquadro si allarga, con un tetto (vedi CSS)
+  gallery.classList.toggle('is-single', videos.length <= 1);
+
+  if (videos.length === 0) {
+    gallery.innerHTML = '<p class="video-gallery-empty">Video in arrivo.</p>';
+    return;
+  }
+
+  gallery.innerHTML = videos.map((v) => {
+    const vertical = v.verticale ? ' is-vertical' : '';
+    const thumb = v.poster
+      ? `<img src="${escapeHtml(v.poster)}" alt="${escapeHtml(v.titolo)}" loading="lazy">`
+      : `<span class="ph">${escapeHtml(v.titolo)}</span>`;
+    return `
+      <a class="video-tile${vertical}" href="video-watch.html?v=${v.id}&amp;cat=${encodeURIComponent(v.categoria)}">
+        ${thumb}
+        <span class="video-tile-play" aria-hidden="true"></span>
+        <span class="video-tile-duration">${escapeHtml(v.durata)}</span>
+      </a>`;
+  }).join('');
+}
+
 /* ---------- Avvio ---------- */
 document.addEventListener('DOMContentLoaded', () => {
   initMobileMenu();
   initLightbox();
   initContactForm();
+  initVideoGallery();
 });
