@@ -571,12 +571,22 @@ body.menu-open .site-nav {
   pointer-events: none; /* i click passano ai pannelli sottostanti */
   width: 100%;
   padding: 0 var(--space-sm);
+  /* Nome e cognome sono un unico marchio: stesso font (Anton), maiuscolo,
+     stessa spaziatura. "Samuele" è 1.39 volte il cognome, il rapporto per cui
+     le due righe hanno la stessa larghezza (in Anton SAMUELE ha 7 lettere da
+     3.39em totali, CASABIANCA 10 da 4.55em): il blocco risulta giustificato */
+  --hero-name-size: clamp(1.6rem, 4.5vw, 3rem);
 }
 
+/* Il text-indent pari alla letter-spacing compensa lo spazio che la
+   letter-spacing aggiunge dopo l'ultima lettera: senza, le righe centrate
+   sarebbero spostate a sinistra di mezza spaziatura */
 .hero-name .script {
-  font-family: var(--font-script);
-  font-size: clamp(3rem, 8vw, 5.5rem);
-  font-weight: 600;
+  font-family: var(--font-display);
+  font-size: calc(var(--hero-name-size) * 1.39);
+  letter-spacing: 0.25em;
+  text-indent: 0.25em;
+  text-transform: uppercase;
   line-height: 1;
   color: var(--color-text);
   text-shadow: 0 2px 30px rgba(0, 0, 0, 0.9);
@@ -584,8 +594,9 @@ body.menu-open .site-nav {
 
 .hero-name .surname {
   font-family: var(--font-display);
-  font-size: clamp(1.6rem, 4.5vw, 3rem);
+  font-size: var(--hero-name-size);
   letter-spacing: 0.25em;
+  text-indent: 0.25em;
   text-transform: uppercase;
   line-height: 1.2;
   text-shadow: 0 2px 30px rgba(0, 0, 0, 0.9);
@@ -595,6 +606,7 @@ body.menu-open .site-nav {
   margin-top: var(--space-xs);
   font-size: clamp(0.7rem, 1.6vw, 0.9rem);
   letter-spacing: 0.35em;
+  text-indent: 0.35em;
   text-transform: uppercase;
   color: var(--color-text-muted);
   text-shadow: 0 1px 10px rgba(0, 0, 0, 0.9);
@@ -1613,6 +1625,7 @@ body.menu-open .site-nav {
 
   .hero-name .tagline {
     letter-spacing: 0.18em;
+    text-indent: 0.18em;
   }
 
   .page-content {

@@ -69,7 +69,7 @@ Nessun build step, nessuna dipendenza (eccetto Google Fonts caricati via CDN):
 - [x] **Pannelli non più a tutta altezza + riga social** sulle 4 pagine a pannelli
   (index, lavoro, foto, celebrazioni): pannelli con altezza fluida e margini
   laterali, icone Instagram/LinkedIn sotto — vedi "Pannelli ridimensionati e riga social"
-- [x] **Link social reali** (Instagram `@ph.samuele`, LinkedIn), **pannelli come
+- [x] **Link social reali** (Instagram `@sc.fotoevideo`, LinkedIn), **pannelli come
   riquadri staccati ad angoli smussati** e **collage a scorrimento** sul pannello
   "Il Mio Lavoro" della home — vedi "Social reali, pannelli smussati, collage a
   scorrimento"
@@ -85,6 +85,9 @@ Nessun build step, nessuna dipendenza (eccetto Google Fonts caricati via CDN):
 - [x] **Contattami in home**: due immagini nuove (`assets/foto/contattami/`),
   armonizzate con filtri CSS — vedi "Immagini del pannello Contattami"
 - [x] **Favicon** in tutte le pagine — vedi "Favicon"
+- [x] **Nuovo Instagram `@sc.fotoevideo`**, **nome in home come blocco unico** in
+  Anton e **"Fotografo, Videomaker e Regia"** — vedi "Nuovo Instagram, nome in home
+  a blocco unico, «Regia»"
 - [ ] Contenuti reali di Streaming (struttura pronta, ma
   `immagini/PORTFOLIO/STREAMING/` è ancora **vuota**: nessun file arrivato)
 - [ ] **Video online**: i `.mp4` esistono solo in locale (esclusi dal repo), quindi
@@ -651,12 +654,13 @@ Tre modifiche nello stesso passaggio.
 
 ### 1. Link social reali
 
-- Instagram: `https://www.instagram.com/ph.samuele/?hl=it`
+- Instagram: `https://www.instagram.com/sc.fotoevideo/?hl=it` *(indirizzo aggiornato
+  in seguito, vedi "Nuovo Instagram, nome in home a blocco unico, «Regia»")*
 - LinkedIn: `https://www.linkedin.com/in/samuele-casabianca-0387b7237/`
 
 Inseriti nella riga `.social-links` delle 4 pagine a pannelli (rimosso il TODO)
 e in `contattami.html`, dove era anche sbagliato il testo del link Instagram:
-mostrava `@samuelecasabianca`, un nome inventato, ora `@ph.samuele`. In
+mostrava `@samuelecasabianca`, un nome inventato, ora `@sc.fotoevideo`. In
 `contattami.html` resta un TODO solo per l'email, ancora segnaposto. Nel sito non
 resta nessun `href="#"`.
 
@@ -1455,6 +1459,99 @@ richiesta.
 
 Console: nessun messaggio su tutte le 20 pagine dopo le due modifiche.
 
+## Nuovo Instagram, nome in home a blocco unico, «Regia»
+
+Tre richieste del cliente nello stesso passaggio.
+
+### 1. Nuovo profilo Instagram
+
+Il vecchio profilo è stato sostituito da `https://www.instagram.com/sc.fotoevideo/?hl=it`
+nei 6 file che lo contengono: la riga social di `index.html`, `lavoro.html`,
+`foto.html`, `celebrazioni.html`, `video.html` e il contatto in
+`contattami.html`, dove anche il testo visibile è passato dal vecchio nome utente a
+`@sc.fotoevideo`. Il vecchio indirizzo non compare più da nessuna parte nel
+repo, questo file incluso (le menzioni nelle sezioni precedenti sono state
+aggiornate).
+
+### 2. Il nome in home è un blocco unico
+
+Prima: "Samuele" in Caveat corsivo (5.5rem) e "CASABIANCA" in Anton maiuscolo
+spaziato (3rem). Ora entrambe le righe sono **Anton, maiuscolo, stessa
+`letter-spacing` 0.25em**, e si leggono come un unico marchio.
+
+- **Proporzione**: "SAMUELE" è **1.39 volte** il cognome (66,7px contro 48px a
+  1440; 35,6px contro 25,6px a 375). È il rapporto per cui le due righe hanno
+  **la stessa larghezza**: in Anton SAMUELE misura 3.39em su 7 lettere,
+  CASABIANCA 4.55em su 10, quindi con la stessa spaziatura
+  `(3.39 + 6·0.25) / (4.55 + 9·0.25) = 1.39`. Il nome resta più grande del
+  cognome (come prima la gerarchia era nome > cognome) e il blocco viene
+  giustificato, con bordi sinistro e destro allineati.
+- **Scartata** la variante con "SAMUELE" più grande (1.76×) e spaziatura
+  stretta (0.08em) per ottenere la stessa larghezza: più d'impatto ma le due
+  righe avevano trame diverse (una compatta, una ariosa) e tornavano a leggersi
+  come due stili.
+- **Implementazione** (`css/style.css`, solo `.hero-name …`): nuova variabile
+  locale `--hero-name-size: clamp(1.6rem, 4.5vw, 3rem)` su `.hero-name`; il
+  cognome la usa direttamente, `.hero-name .script` usa
+  `calc(var(--hero-name-size) * 1.39)`, così il rapporto vale a tutte le
+  larghezze (anche quando scattano i limiti del `clamp`). Tolto il
+  `font-weight: 600` (Anton ha solo il 400: sarebbe stato un grassetto finto).
+- **Centratura**: `letter-spacing` aggiunge spazio anche dopo l'ultima lettera,
+  quindi le righe centrate erano spostate a sinistra di mezza spaziatura (6px
+  sul cognome, già prima). Un `text-indent` pari alla spaziatura lo compensa,
+  su nome, cognome e tagline (0.35em, 0.18em sotto i 768px).
+- **Non toccati**: la variabile `--font-script` e `.about-text h1 .script` —
+  il titolo "Piacere, mi chiamo Samuele!" di `chi-sono.html` resta in Caveat
+  corsivo color oro. La classe `.script` nell'HTML della home è rimasta (ora è
+  solo un nome: lo stile lo dà `.hero-name .script`). Caveat è ancora caricato
+  anche da `index.html` come da tutte le pagine (head comune), anche se in home
+  non è più usato.
+
+### 3. Da "Regista" a "Regia"
+
+La riga di presentazione "Fotografo, Videomaker e Regista" → "Fotografo,
+Videomaker e Regia". La riga compare in **14 file, non 17**: la hero di
+`index.html` più i footer delle 13 pagine che hanno un footer. Le 5 pagine a
+pannelli (`index`, `lavoro`, `foto`, `celebrazioni`, `video`) non hanno footer.
+Oltre a queste, nella stessa forma di riga di presentazione:
+
+- `<title>` di `index.html` → "Samuele Casabianca — Fotografo, Videomaker e
+  Regia" (è la stessa riga, coerente con la hero);
+- la seconda riga del titolo di `chi-sono.html` (sotto "Piacere, mi chiamo
+  Samuele!") → "Fotografo, Videomaker e Regia".
+
+**Lasciati con "regista"**, perché lì la parola descrive la persona dentro una
+frase e "regia" la renderebbe sgrammaticata:
+
+- `chi-sono.html`, primo paragrafo: "Sono un fotografo, videomaker e regista con
+  sede a Milano." — invariato;
+- meta description di `index.html`: "Portfolio di Samuele Casabianca, fotografo,
+  videomaker e regista con sede a Milano." — invariata;
+- `README.md` (stessa frase) — invariato.
+
+### Verifiche fatte in browser (Chrome, `npx serve -l 8000`)
+
+Misure prese in iframe di 1440x900 e 375x800 sulla stessa origine.
+
+- **Hero della home**: Anton 400 maiuscolo su entrambe le righe; larghezza
+  visibile SAMUELE 326,1px / CASABIANCA 326,6px a 1440 (bordo sinistro 557 /
+  556,7) e 173,9 / 174,2px a 375 (100,5 / 100,4); tagline "FOTOGRAFO,
+  VIDEOMAKER E REGIA" su una riga a entrambe le larghezze. A 1440 la home resta
+  alta 900 (nessuno scroll); a 375 il blocco nome è un po' più basso di prima
+  (la prima riga è passata da 48 a 35,6px) e i pannelli partono a y=180.
+  Screenshot guardati a entrambe le larghezze.
+- **`chi-sono.html`**: `.about-text h1 .script` ancora Caveat, 54,4px a 1440 e
+  38,4px a 375, colore oro, nessun maiuscolo; il paragrafo dice ancora
+  "fotografo, videomaker e regista".
+- **18 pagine**: i 13 footer dicono "… E REGIA"; i 6 link Instagram puntano al
+  nuovo profilo con `target="_blank"`; nessuno scroll orizzontale a 1440 e a
+  375. Click reale sull'icona di `lavoro.html`: si apre una nuova scheda su
+  `https://www.instagram.com/sc.fotoevideo/?hl=it`.
+- `grep`: nessuna occorrenza del vecchio profilo nel repo; "regista" solo nei 3 punti voluti
+  sopra (più il nome file `theregisti-…jpg`, che non c'entra).
+- **Non verificato**: Safari/Firefox, telefoni reali, console delle pagine
+  (la modifica è solo CSS e testo, nessun JS toccato).
+
 ## Deploy
 
 Il sito è **online su https://samuelecasabianca.com**.
@@ -1567,7 +1664,8 @@ passare al successivo).
 ## Decisioni prese
 
 - **Font (Google Fonts)**: `Anton` per i titoli strutturali (display, condensed
-  bold), `Caveat` per lo script "Samuele" / titolo bio, `Archivo` per il testo
+  bold, anche per il nome in home, "Samuele" compreso), `Caveat` per il titolo
+  corsivo di `chi-sono.html`, `Archivo` per il testo
   corrente. Cambiabili dalle variabili `--font-display`, `--font-script`,
   `--font-body` in `:root`.
 - **Colori**: tema scuro. Variabili principali: `--color-bg` (#0e0e10),
@@ -1827,7 +1925,7 @@ descritta lì prima di collegarle):
 **Altri**:
 - `contattami.html` — email reale (anche in `js/main.js`, funzione
   `initContactForm`, indirizzo del `mailto:`). *Instagram e LinkedIn sono stati
-  inseriti*: `https://www.instagram.com/ph.samuele/?hl=it` e
+  inseriti*: `https://www.instagram.com/sc.fotoevideo/?hl=it` e
   `https://www.linkedin.com/in/samuele-casabianca-0387b7237/`, anche nella riga
   social delle pagine a pannelli.
 
