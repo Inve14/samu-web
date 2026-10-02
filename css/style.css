@@ -218,6 +218,13 @@ button {
   width: 40px;
   height: 40px;
   padding: 8px;
+}
+
+/* Con il menu aperto la nav sale sopra l'overlay (.mobile-menu, z-index 200),
+   così la X resta cliccabile. Non basta uno z-index sull'hamburger: la nav è
+   `position: fixed` con il suo z-index, quindi crea un contesto di
+   impilamento da cui i figli non possono uscire. */
+body.menu-open .site-nav {
   z-index: 210;
 }
 
@@ -258,6 +265,7 @@ button {
      dell'ultima voce invece che con justify-content: center, che taglierebbe
      la parte alta rendendola irraggiungibile. */
   overflow-y: auto;
+  overscroll-behavior: contain; /* lo scroll del menu non trascina la pagina sotto */
   padding: var(--nav-height) var(--space-sm);
   opacity: 0;
   visibility: hidden;

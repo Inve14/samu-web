@@ -149,7 +149,7 @@ Video (con le 3 categorie annidate).
 | `contattami.html` | Form contatti (mailto:) + email/Instagram/LinkedIn |
 | `css/style.css` | Tutto lo stile; variabili tema in `:root` in cima al file |
 | `js/panels.js` | `initVerticalPanels()`: crossfade slide solo-hover, collage `panel--scroll`, inquadratura per foto e `data-src` in `data-images`, transizioni animate tra pagine a pannelli |
-| `js/main.js` | Menu hamburger overlay, lightbox galleria, form mailto, gallerie video (`initVideoGallery`) — tutto in auto-init su DOMContentLoaded — + helper condivisi delle sezioni video (`escapeHtml`, `videoThumbHtml`, `videoPlayerHtml`) |
+| `js/main.js` | Menu hamburger overlay, breadcrumb adattivo (`initBreadcrumb`), lightbox galleria, form mailto, gallerie video (`initVideoGallery`) — tutto in auto-init su DOMContentLoaded — + helper condivisi delle sezioni video (`escapeHtml`, `videoThumbHtml`, `videoPlayerHtml`) |
 | `js/splash.js` | Splash screen di benvenuto (incluso solo in `index.html`); anima il logo dallo splash alla nav (FLIP) all'uscita |
 | `js/video-data.js` | Dataset condiviso da `streaming.html`/`streaming-watch.html`, dalle 3 gallerie video e da `video-watch.html`: `VIDEO_DATA` con i 22 video reali, `VIDEO_CATEGORIE` (nome e pagina galleria di ogni categoria), `STREAM_DATA` ancora placeholder |
 | `assets/favicon/` | Favicon generate da `assets/logo-sc.png` (16, 32, apple-touch 180, 512) — vedi "Favicon" |
@@ -1391,15 +1391,69 @@ percorso a click è stato fatto nella finestra reale, le misure a 1440x900 e
   fisico a 1440x900; screenshot a 375 solo a bassa risoluzione (forma e
   impaginazione visibili, dettagli fini no).
 
-### Problemi trovati e non risolti (preesistenti, fuori da questo passaggio)
+### Problemi trovati e risolti nel passaggio successivo
 
-- **Il menu hamburger non si chiude con la X**: l'overlay (`z-index: 200`) sta
-  sopra la nav (`100`), quindi l'hamburger/X non riceve il click. Si chiude solo
-  con ESC o scegliendo una voce — su telefono, di fatto, solo scegliendo una voce.
-- **Breadcrumb su telefono**: a 375px ha ~208px. Nelle pagine più profonde
-  ("Lavoro / Foto / Celebrazioni / Matrimoni") anche i livelli superiori escono
-  dallo spazio; in `video-watch.html` del titolo resta solo l'iniziale con "…"
-  (il titolo completo è comunque l'`<h1>` sotto il player).
+Due difetti preesistenti emersi durante le verifiche, corretti subito dopo su
+richiesta.
+
+**1. Il menu hamburger non si chiudeva con la X.**
+- *Causa*: `.nav-burger` aveva già `z-index: 210` per stare sopra l'overlay
+  (`.mobile-menu`, 200), ma è dentro `.site-nav`, che è `position: fixed` con
+  `z-index: 100` e quindi crea un contesto di impilamento: il 210 valeva solo
+  dentro la nav, e l'intera nav restava sotto l'overlay. La X si vedeva in
+  trasparenza ma non riceveva il click; il menu si chiudeva solo con ESC o
+  scegliendo una voce (su telefono, di fatto, solo scegliendo una voce).
+- *Soluzione*: `toggle()` in `js/main.js` mette `menu-open` su `<body>` e
+  `body.menu-open .site-nav { z-index: 210 }` porta tutta la nav sopra
+  l'overlay finché il menu è aperto (logo, breadcrumb e X restano visibili,
+  come un'intestazione del menu). Tolto lo `z-index` inutile dall'hamburger.
+  In più: `aria-label` passa da "Apri il menu" a "Chiudi il menu" e viceversa;
+  `overscroll-behavior: contain` sull'overlay, così scorrendo il menu non si
+  trascina la pagina sotto.
+- *Verificato*: click veri sull'hamburger e poi sulla X (finestra reale);
+  in iframe 375x800 su `video-sport.html` (nav piena), `index.html` (dopo lo
+  splash) e `celebrazioni-matrimoni.html`: la X è l'elemento in cima nel suo
+  punto, chiude il menu, `menu-open` e `z-index` della nav tornano a posto; ESC
+  continua a chiudere; la prima voce resta sotto la nav.
+
+**2. Breadcrumb troppo lungo su telefono.**
+- *Causa*: a 375px il breadcrumb ha ~208px. "Lavoro / Foto / Celebrazioni /
+  Matrimoni" ne occupa ~320: la voce corrente spariva del tutto e anche i
+  livelli superiori venivano tagliati; in `video-watch.html` del titolo restava
+  l'iniziale.
+- *Soluzione*: `initBreadcrumb()` in `js/main.js`. Se il percorso non sta, i
+  livelli più esterni vengono raccolti in un "…" partendo da sinistra, solo
+  quanti ne servono. Il livello genitore viene raccolto solo se così il nome
+  della pagina corrente entra intero (sui titoli lunghi di `video-watch.html`
+  non basterebbe, quindi lì resta il link alla categoria e il titolo si
+  accorcia con i puntini — il titolo intero è l'`<h1>` sotto il player). Il
+  "…" è un link al livello raccolto più vicino (`aria-label` "Torna a …"), così
+  si può sempre risalire. Ricalcolo all'arrivo dei Google Fonts
+  (`document.fonts.ready`) e al ridimensionamento della finestra. Quando il
+  percorso sta — sempre, su desktop — non cambia nulla.
+- *Risultato a 375x800*:
+
+  | Pagina | Prima | Dopo |
+  |---|---|---|
+  | `programmi-tv.html` | Lavoro / Foto / Programmi T… | … / Foto / Programmi TV |
+  | `celebrazioni.html` | Lavoro / Foto / Celebrazio… | … / Foto / Celebrazioni |
+  | `celebrazioni-matrimoni.html` | Lavoro / Foto / Celebrazio… (corrente invisibile) | … / Matrimoni (… → `celebrazioni.html`) |
+  | `celebrazioni-feste-private.html` | idem | … / Feste Private |
+  | `video-watch.html?v=12` | Lavoro / Video / Sport / A… | … / Sport / AU – Piacenza — 1… |
+  | `streaming-watch.html?v=3` | Lavoro / Streaming / Strea… | … / Streaming / Streaming plac… |
+
+  Le altre pagine (es. "Lavoro / Video / Sport") stavano già e restano intere.
+- *Verificato*: tutte le 17 pagine con breadcrumb a 375 e a 1440 (a 1440 il
+  percorso è sempre completo, nessuna voce accorciata); nessuno scroll
+  orizzontale; click sul "…" di `celebrazioni-matrimoni.html` →
+  `celebrazioni.html`. **Ridimensionamento**: la finestra di Chrome usata per i
+  test risultava nascosta (`visibilityState: hidden`), e Chrome in quello stato
+  non consegna l'evento `resize` né esegue `requestAnimationFrame`; il ricalcolo
+  è stato quindi provato inviando `resize` a mano nell'iframe (1440 → 375 → 560
+  → 1440 → 375: percorso completo / "… / Matrimoni" / completo / completo / "… /
+  Matrimoni"). Non verificato con un vero trascinamento della finestra.
+
+Console: nessun messaggio su tutte le 20 pagine dopo le due modifiche.
 
 ## Deploy
 
@@ -1661,11 +1715,15 @@ passare al successivo).
   Con 14 voci (categorie di Foto e di Video annidate) può essere più alto dello
   schermo: l'overlay scorre e il centraggio è fatto con i margini automatici di
   prima e ultima voce, non con `justify-content: center` (che taglierebbe la
-  parte alta senza poterci arrivare).
+  parte alta senza poterci arrivare). Con il menu aperto `<body>` ha
+  `menu-open` e la nav sale sopra l'overlay, così la X chiude il menu (vedi
+  "Problemi trovati e risolti").
 - **Breadcrumb**: nella nav fissa di ogni pagina interna, con link ai livelli
   superiori (es. "Lavoro / Foto / Celebrazioni / Matrimoni"; vedi "Sitemap").
-  Se manca spazio si accorcia solo la voce corrente, con i puntini
-  (`text-overflow: ellipsis`); i livelli superiori restano interi.
+  Se non sta (su telefono), `initBreadcrumb()` in `js/main.js` raccoglie i
+  livelli più esterni in un "…" cliccabile, dando priorità al nome intero della
+  pagina corrente; se nemmeno così basta, la voce corrente si accorcia con i
+  puntini (`text-overflow: ellipsis`). Vedi "Problemi trovati e risolti".
 - **Pagine galleria generate da template**: le 9 pagine foglia condividono la
   stessa struttura (cambiano titolo, breadcrumb, descrizione e numero di
   placeholder). Se serve modificarle tutte, conviene farlo con un

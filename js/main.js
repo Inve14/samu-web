@@ -36,11 +36,75 @@ function initMobileMenu() {
     menu.classList.toggle('is-open', isOpen);
     burger.classList.toggle('is-open', isOpen);
     burger.setAttribute('aria-expanded', String(isOpen));
+    burger.setAttribute('aria-label', isOpen ? 'Chiudi il menu' : 'Apri il menu');
+    // Porta la nav (e quindi la X) sopra l'overlay, vedi CSS
+    document.body.classList.toggle('menu-open', isOpen);
   }
 
   burger.addEventListener('click', () => toggle());
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') toggle(false);
+  });
+}
+
+/* ---------- Breadcrumb che si adatta alla larghezza ----------
+   Su telefono il percorso completo non sta nella nav (es. "Lavoro / Foto /
+   Celebrazioni / Matrimoni" in ~200px). Se non sta, i livelli più esterni
+   vengono raccolti in "…" partendo da sinistra, solo quanti ne servono. Il
+   livello genitore si raccoglie solo se così il nome della pagina corrente
+   entra intero (su un titolo lungo di video-watch.html non basterebbe: lì
+   il genitore resta e il titolo si accorcia con i puntini, vedi CSS). "…" è
+   un link al livello raccolto più vicino, così si può sempre risalire.
+   Quando il percorso sta, non cambia nulla. Il percorso completo è nel menu. */
+function initBreadcrumb() {
+  const bc = document.querySelector('.breadcrumb');
+  if (!bc) return;
+  const current = bc.querySelector('[aria-current]');
+  // Ogni livello superiore è un link seguito dal suo separatore
+  const steps = Array.from(bc.querySelectorAll(':scope > a'))
+    .map((link) => [link, link.nextElementSibling]);
+  if (!current || steps.length < 2) return; // nessun livello da raccogliere
+
+  const more = document.createElement('a');
+  more.className = 'breadcrumb-more';
+  more.textContent = '…';
+  const moreSep = document.createElement('span');
+  moreSep.className = 'sep';
+  moreSep.textContent = '/';
+  bc.prepend(more, moreSep);
+
+  const overflows = () =>
+    bc.scrollWidth > bc.clientWidth || current.scrollWidth > current.clientWidth;
+
+  function collapse(count) {
+    steps.forEach((step, i) => step.forEach((el) => { el.hidden = i < count; }));
+    more.hidden = moreSep.hidden = count === 0;
+    if (count > 0) {
+      const nearest = steps[count - 1][0];
+      more.href = nearest.getAttribute('href');
+      more.setAttribute('aria-label', `Torna a ${nearest.textContent.trim()}`);
+    }
+  }
+
+  function fit() {
+    let count = 0;
+    collapse(0);
+    while (count < steps.length - 1 && overflows()) collapse(++count);
+    // Ultima risorsa: via anche il genitore, ma solo se la pagina corrente
+    // entra intera; altrimenti meglio tenere il link per tornare su
+    if (overflows()) {
+      collapse(steps.length);
+      if (overflows()) collapse(count);
+    }
+  }
+
+  fit();
+  // Le misure dipendono dai font (Google Fonts arrivano dopo) e dalla finestra
+  if (document.fonts) document.fonts.ready.then(fit);
+  let frame = 0;
+  window.addEventListener('resize', () => {
+    cancelAnimationFrame(frame);
+    frame = requestAnimationFrame(fit);
   });
 }
 
@@ -242,6 +306,7 @@ function initVideoGallery() {
 /* ---------- Avvio ---------- */
 document.addEventListener('DOMContentLoaded', () => {
   initMobileMenu();
+  initBreadcrumb();
   initLightbox();
   initContactForm();
   initVideoGallery();
