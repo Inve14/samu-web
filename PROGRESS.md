@@ -1563,17 +1563,68 @@ Il sito è **online su https://samuelecasabianca.com**.
   record `A` su `@` e un `CNAME` su `www` che puntano a Vercel. Certificato
   HTTPS emesso da Vercel.
 - **Cosa non sta nel repo** (vedi `.gitignore`): gli originali di `immagini/`,
-  tutti i file `.mp4` e i PDF. **I video esistono solo in locale** in
-  `assets/video/`: `js/video-data.js` punta a quei file, quindi **sul sito
-  pubblicato le pagine `video-watch.html` non riproducono nulla** (pannelli,
-  gallerie e miniature invece funzionano, i poster sono nel repo) finché i video non vengono
-  caricati altrove e i `src` aggiornati.
+  tutti i file `.mp4` e i PDF. I video con `src` esistono **solo in locale** in
+  `assets/video/`, quindi sul sito pubblicato le loro pagine
+  `video-watch.html` non riproducono nulla (pannelli, gallerie e miniature
+  invece funzionano, i poster sono nel repo). Fanno eccezione i video con il
+  campo `youtube`, che funzionano ovunque — vedi "Primi video su YouTube".
 - **Dove caricarli**: `video-watch.html` usa un `<video controls>` HTML, quindi
   basta un hosting di file MP4 diretti con supporto alle richieste Range (es.
   Vercel Blob, Cloudflare R2, Bunny). In alternativa un embed YouTube, ma
   richiederebbe di cambiare `videoPlayerHtml()` in `js/main.js`. Prima conviene
   ricomprimerli (vedi "Da fare quando ci sarà `ffmpeg`"): oggi vanno da ~45 a
   ~300 MB l'uno.
+
+## Primi video su YouTube
+
+I primi tre video davvero funzionanti **anche online**. Finora il dataset
+puntava solo a file `.mp4` locali, esclusi dal repository: le gallerie si
+vedevano ma il player restava vuoto sul sito pubblicato.
+
+| Voce | Cosa è cambiato | Video |
+|---|---|---|
+| id 4 — Video Emozionale | il file locale è sostituito dall'embed | `gMEN3C5hZ-M` |
+| id 5 — Festa 50 Anni Miar | il file locale è sostituito dall'embed | `--_EgvYigjA` |
+| id 23 — Mura Festival — Lidia Cao | **nuovo**, Short verticale | `PhGkrl7YK8E` |
+
+Tutti e tre in categoria `eventi`, dal canale di Samuele (verificato via
+l'endpoint oEmbed di YouTube, che restituisce `author_name` "Samuele
+Casabianca").
+
+### Come funziona
+
+Nuovo campo facoltativo **`youtube`** nelle voci di `VIDEO_DATA`. Di
+conseguenza `videoPlayerHtml()` in `js/main.js` ha ora tre rami, in
+quest'ordine: `youtube` → embed; altrimenti `src` → `<video>` locale;
+altrimenti segnaposto. Per aggiungere un video basta quindi una riga nel
+dataset, nessuna modifica a HTML o CSS.
+
+L'embed usa il dominio **youtube-nocookie.com**, che non scrive cookie finché
+non si preme play, e `loading="lazy"`: aprendo la pagina non parte nessun
+download del video. In CSS è stata aggiunta `.watch-player--real iframe`
+accanto alla regola gemella per `video` (su un iframe `object-fit` non ha
+effetto: le eventuali fasce attorno al video le gestisce YouTube).
+
+### Due dettagli non ovvi
+
+**La durata dello Short è assente, di proposito.** YouTube non espone la durata
+degli Short, e inventarla sarebbe stato peggio che ometterla. Il campo `durata`
+è quindi diventato facoltativo: il riquadro della galleria, i meta della pagina
+di riproduzione e i video correlati lo mostrano solo se c'è. Le durate di id 4 e
+id 5 restano quelle lette a suo tempo dai file locali, che sono gli stessi
+montaggi.
+
+**Il poster dello Short è l'unica immagine esterna del sito.** Per gli altri
+video la miniatura è un file in `assets/video/poster/`, estratto dal filmato;
+questo Short non è mai passato da `assets/video/`, quindi non esiste un
+fotogramma locale, e scaricare la miniatura da `i.ytimg.com` non è stato
+possibile. La voce punta perciò a
+`https://i.ytimg.com/vi/PhGkrl7YK8E/hqdefault.jpg`: è l'unica deroga alla regola
+"il sito referenzia solo `assets/`", e il video è comunque servito da YouTube.
+Quella miniatura è 4:3 con il contenuto verticale centrato, e il riquadro 9:16
+la ritaglia con `cover` eliminando le bande laterali. **Se arriva un fotogramma
+locale, sostituirlo**: basta passarlo per la solita pipeline (exif-transpose →
+1800px → JPEG q82) e cambiare il `poster`.
 
 ## Bugfix
 
@@ -1922,21 +1973,21 @@ descritta lì prima di collegarle):
 > *Nota*: `VIDEO_DATA` **non** è più un placeholder — contiene i 22 video reali
 > con `src` e `poster`. Vedi "Video reali: 22 file inseriti".
 
-**Altri**:
-- `contattami.html` — email reale (anche in `js/main.js`, funzione
-  `initContactForm`, indirizzo del `mailto:`). *Instagram e LinkedIn sono stati
-  inseriti*: `https://www.instagram.com/sc.fotoevideo/?hl=it` e
-  `https://www.linkedin.com/in/samuele-casabianca-0387b7237/`, anche nella riga
-  social delle pagine a pannelli.
+**Altri**: nessuno. I contatti sono tutti reali — email
+`sc.samuelecasabianca@gmail.com` (in `contattami.html` e nel `mailto:` di
+`initContactForm`), Instagram `https://www.instagram.com/sc.fotoevideo/?hl=it`
+e LinkedIn `https://www.linkedin.com/in/samuele-casabianca-0387b7237/`, anche
+nella riga social delle pagine a pannelli.
 
 ## Prossimi passi
 
 1. Ricevere le foto mancanti (Brand, Gala, Calcio, Pallavolo) e inserirle con la
    stessa pipeline usata per le altre categorie (vedi "Immagini reali inserite").
-2. Pubblicare i video: caricarli altrove (idealmente dopo averli ricompressi) e
-   aggiornare i `src` in `js/video-data.js`, vedi "Deploy". Streaming: ricevere i
+2. Pubblicare i restanti 20 video: la strada è già tracciata, bastano un
+   caricamento su YouTube e il campo `youtube` nel dataset (vedi "Primi video su
+   YouTube"), senza toccare altro. Streaming: ricevere i
    contenuti e sostituire `STREAM_DATA`.
-3. Inserire l'email reale di Samuele (i social sono già reali).
+3. ~~Email e social reali~~ — fatto.
 4. Rifiniture su testi bio e descrizioni categorie (ora testi provvisori).
 5. ~~Favicon~~ — fatta, vedi "Favicon". Resta da valutare una versione semplificata
    per il 16px (vedi lì) e l'immagine Open Graph per la condivisione.

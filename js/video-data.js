@@ -16,8 +16,10 @@
      durata       'M:SS', letta dall'atomo mvhd del file MP4
      verticale    true se il file è girato in verticale (9:16): il player e la
                   miniatura si adattano invece di deformare l'immagine
-     src          percorso del file video reale; se manca, la pagina mostra il
-                  placeholder al posto del player
+     youtube      id del video su YouTube: se presente il player usa l'embed
+                  invece del file locale, e il video funziona anche online
+     src          percorso del file video reale; se mancano sia `youtube` sia
+                  `src`, la pagina mostra il placeholder al posto del player
      poster       fotogramma di copertina; se manca, si vede il placeholder
      descrizione  testo sotto al player
 
@@ -48,9 +50,14 @@ const VIDEO_DATA = [
   { id: 1, titolo: 'Miu Miu — 7 giugno 2024', categoria: 'eventi', canale: 'Samuele Casabianca', durata: '0:47', verticale: true, src: 'assets/video/eventi/miu-miu-07-06-2024.mp4', poster: 'assets/video/poster/miu-miu-07-06-2024.jpg', descrizione: 'Video di evento realizzato da Samuele Casabianca.' },
   { id: 2, titolo: 'Video Evento 1', categoria: 'eventi', canale: 'Samuele Casabianca', durata: '0:36', verticale: false, src: 'assets/video/eventi/video-evento-1.mp4', poster: 'assets/video/poster/video-evento-1.jpg', descrizione: 'Video di evento realizzato da Samuele Casabianca.' },
   { id: 3, titolo: 'Video Evento 2', categoria: 'eventi', canale: 'Samuele Casabianca', durata: '0:35', verticale: false, src: 'assets/video/eventi/video-evento-2.mp4', poster: 'assets/video/poster/video-evento-2.jpg', descrizione: 'Video di evento realizzato da Samuele Casabianca.' },
-  { id: 4, titolo: 'Video Emozionale', categoria: 'eventi', canale: 'Samuele Casabianca', durata: '1:42', verticale: false, src: 'assets/video/eventi/video-emozionale.mp4', poster: 'assets/video/poster/video-emozionale.jpg', descrizione: 'Video di evento realizzato da Samuele Casabianca.' },
-  { id: 5, titolo: 'Festa 50 Anni Miar', categoria: 'eventi', canale: 'Samuele Casabianca', durata: '2:04', verticale: false, src: 'assets/video/eventi/festa-50-anni-miar.mp4', poster: 'assets/video/poster/festa-50-anni-miar.jpg', descrizione: 'Video di evento realizzato da Samuele Casabianca.' },
+  { id: 4, titolo: 'Video Emozionale', categoria: 'eventi', canale: 'Samuele Casabianca', durata: '1:42', verticale: false, youtube: 'gMEN3C5hZ-M', poster: 'assets/video/poster/video-emozionale.jpg', descrizione: 'Video di evento realizzato da Samuele Casabianca.' },
+  { id: 5, titolo: 'Festa 50 Anni Miar', categoria: 'eventi', canale: 'Samuele Casabianca', durata: '2:04', verticale: false, youtube: '--_EgvYigjA', poster: 'assets/video/poster/festa-50-anni-miar.jpg', descrizione: 'Video di evento realizzato da Samuele Casabianca.' },
   { id: 6, titolo: 'Videoriassunto Evento IKEA — 28 aprile 2026', categoria: 'eventi', canale: 'Samuele Casabianca', durata: '1:26', verticale: false, src: 'assets/video/eventi/videoriassunto-ikea-28-04-2026.mp4', poster: 'assets/video/poster/videoriassunto-ikea-28-04-2026.jpg', descrizione: 'Video di evento realizzato da Samuele Casabianca.' },
+  // Short verticale su YouTube: `durata` assente perche' YouTube non la espone
+  // per gli Short, e il riquadro la omette invece di mostrare un valore inventato.
+  // `poster` punta alla miniatura di YouTube: non esiste un file locale per
+  // questo video, che non e' mai passato da assets/video/.
+  { id: 23, titolo: 'Mura Festival — Lidia Cao', categoria: 'eventi', canale: 'Samuele Casabianca', verticale: true, youtube: 'PhGkrl7YK8E', poster: 'https://i.ytimg.com/vi/PhGkrl7YK8E/hqdefault.jpg', descrizione: 'Video di evento realizzato da Samuele Casabianca.' },
   { id: 7, titolo: 'Matrimonio Claudia & Ivan — 14 settembre 2024', categoria: 'matrimoni', canale: 'Samuele Casabianca', durata: '4:58', verticale: false, src: 'assets/video/matrimoni/matrimonio-claudia-ivan-14-09-2024.mp4', poster: 'assets/video/poster/matrimonio-claudia-ivan-14-09-2024.jpg', descrizione: 'Video di matrimonio realizzato da Samuele Casabianca.' },
   { id: 8, titolo: 'AU – Alghero', categoria: 'sport', canale: 'Samuele Casabianca', durata: '1:39', verticale: true, src: 'assets/video/sport/au-alghero.mp4', poster: 'assets/video/poster/au-alghero.jpg', descrizione: 'Video sportivo realizzato da Samuele Casabianca.' },
   { id: 9, titolo: 'AU – CUS — 30 marzo', categoria: 'sport', canale: 'Samuele Casabianca', durata: '1:38', verticale: true, src: 'assets/video/sport/au-cus-30-marzo.mp4', poster: 'assets/video/poster/au-cus-30-marzo.jpg', descrizione: 'Video sportivo realizzato da Samuele Casabianca.' },

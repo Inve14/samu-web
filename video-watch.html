@@ -65,7 +65,9 @@
 
     document.getElementById('watch-player-slot').innerHTML = videoPlayerHtml(current);
     document.getElementById('watch-title').textContent = current.titolo;
-    document.getElementById('watch-meta').textContent = `${current.canale} · ${current.durata}`;
+    // La durata può mancare (es. gli Short di YouTube, che non la espongono)
+    document.getElementById('watch-meta').textContent =
+      current.durata ? `${current.canale} · ${current.durata}` : current.canale;
     document.getElementById('watch-description').textContent = current.descrizione;
     document.getElementById('breadcrumb-title').textContent = current.titolo;
 
@@ -94,7 +96,7 @@
         ${videoThumbHtml(v, 'watch-related-thumb')}
         <div class="watch-related-info">
           <div class="watch-related-title">${escapeHtml(v.titolo)}</div>
-          <div class="watch-related-meta">${escapeHtml(v.canale)} · ${escapeHtml(v.durata)}</div>
+          <div class="watch-related-meta">${v.durata ? `${escapeHtml(v.canale)} · ${escapeHtml(v.durata)}` : escapeHtml(v.canale)}</div>
         </div>
       </a>
     `).join('');

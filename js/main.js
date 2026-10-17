@@ -209,7 +209,7 @@ function initContactForm() {
     );
 
     // TODO: sostituire con l'email reale di Samuele
-    window.location.href = `mailto:info@samuelecasabianca.it?subject=${subject}&body=${body}`;
+    window.location.href = `mailto:sc.samuelecasabianca@gmail.com?subject=${subject}&body=${body}`;
   });
 }
 
@@ -241,10 +241,27 @@ function videoThumbHtml(v, baseClass = 'video-thumb') {
     </div>`;
 }
 
-/* Player della pagina di riproduzione. Niente autoplay e `preload="metadata"`:
-   i file sono da decine di MB, così la pagina scarica solo l'intestazione e
-   il resto parte al play dell'utente. */
+/* Player della pagina di riproduzione. Tre casi, in quest'ordine:
+   1. `youtube`: embed di YouTube. È l'unico che funziona anche online, perché
+      i file .mp4 non stanno nel repository (vedi .gitignore). Dominio
+      youtube-nocookie.com: non scrive cookie finché non si preme play.
+   2. `src`: file locale, con `preload="metadata"` e niente autoplay — i file
+      sono da decine di MB, così la pagina scarica solo l'intestazione.
+   3. nessuno dei due: segnaposto. */
 function videoPlayerHtml(v) {
+  if (v.youtube) {
+    const vertical = v.verticale ? ' is-vertical' : '';
+    return `
+      <div class="watch-player watch-player--real${vertical}">
+        <iframe
+          src="https://www.youtube-nocookie.com/embed/${encodeURIComponent(v.youtube)}"
+          title="${escapeHtml(v.titolo)}"
+          allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          referrerpolicy="strict-origin-when-cross-origin"
+          allowfullscreen
+          loading="lazy"></iframe>
+      </div>`;
+  }
   if (!v.src) {
     return `
       <div class="watch-player">
@@ -298,7 +315,7 @@ function initVideoGallery() {
       <a class="video-tile${vertical}" href="video-watch.html?v=${v.id}&amp;cat=${encodeURIComponent(v.categoria)}">
         ${thumb}
         <span class="video-tile-play" aria-hidden="true"></span>
-        <span class="video-tile-duration">${escapeHtml(v.durata)}</span>
+        ${v.durata ? `<span class="video-tile-duration">${escapeHtml(v.durata)}</span>` : ''}
       </a>`;
   }).join('');
 }
