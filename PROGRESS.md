@@ -1563,11 +1563,10 @@ Il sito è **online su https://samuelecasabianca.com**.
   record `A` su `@` e un `CNAME` su `www` che puntano a Vercel. Certificato
   HTTPS emesso da Vercel.
 - **Cosa non sta nel repo** (vedi `.gitignore`): gli originali di `immagini/`,
-  tutti i file `.mp4` e i PDF. I video con `src` esistono **solo in locale** in
-  `assets/video/`, quindi sul sito pubblicato le loro pagine
-  `video-watch.html` non riproducono nulla (pannelli, gallerie e miniature
-  invece funzionano, i poster sono nel repo). Fanno eccezione i video con il
-  campo `youtube`, che funzionano ovunque — vedi "Primi video su YouTube".
+  tutti i file `.mp4` e i PDF. Non è più un problema: **tutti i video sono su
+  YouTube** e il sito li mostra via embed, quindi la sezione video funziona per
+  intero anche online — vedi "Tutti i video su YouTube". I `.mp4` in
+  `assets/video/` non servono più al sito.
 - **Dove caricarli**: `video-watch.html` usa un `<video controls>` HTML, quindi
   basta un hosting di file MP4 diretti con supporto alle richieste Range (es.
   Vercel Blob, Cloudflare R2, Bunny). In alternativa un embed YouTube, ma
@@ -1575,56 +1574,96 @@ Il sito è **online su https://samuelecasabianca.com**.
   ricomprimerli (vedi "Da fare quando ci sarà `ffmpeg`"): oggi vanno da ~45 a
   ~300 MB l'uno.
 
-## Primi video su YouTube
+## Tutti i video su YouTube
 
-I primi tre video davvero funzionanti **anche online**. Finora il dataset
-puntava solo a file `.mp4` locali, esclusi dal repository: le gallerie si
-vedevano ma il player restava vuoto sul sito pubblicato.
+**Il dataset è stato azzerato e ricostruito**: da 22 voci che puntavano a file
+`.mp4` locali a **13 voci, tutte con il campo `youtube`**. È il passaggio che
+rende la sezione video davvero funzionante sul sito pubblicato — prima le
+gallerie si vedevano ma il player restava vuoto, perché i file non entrano nel
+repository.
 
-| Voce | Cosa è cambiato | Video |
-|---|---|---|
-| id 4 — Video Emozionale | il file locale è sostituito dall'embed | `gMEN3C5hZ-M` |
-| id 5 — Festa 50 Anni Miar | il file locale è sostituito dall'embed | `--_EgvYigjA` |
-| id 23 — Mura Festival — Lidia Cao | **nuovo**, Short verticale | `PhGkrl7YK8E` |
+Scelta del cliente: invece di aggiungere i nuovi video a quelli esistenti, si
+riparte dalla lista che ha fornito lui, così il sito contiene esattamente i
+video che vuole pubblicare e nient'altro.
 
-Tutti e tre in categoria `eventi`, dal canale di Samuele (verificato via
-l'endpoint oEmbed di YouTube, che restituisce `author_name` "Samuele
-Casabianca").
+### I 13 video
+
+| Categoria | Titolo | YouTube | Forma |
+|---|---|---|---|
+| eventi | Festa 50 Anni Miar | `--_EgvYigjA` | 16:9 |
+| eventi | Video Emozionale — Miar | `gMEN3C5hZ-M` | 16:9 |
+| eventi | Samec Cremona | `K96zFyIWVV8` | 16:9 |
+| eventi | Samec x SRT Cuneo | `4KUC6pT8ID0` | 16:9 |
+| eventi | Mura Festival — Lidia Cao | `PhGkrl7YK8E` | Short 9:16 |
+| matrimoni | Matrimonio Claudia & Ivan — 14 settembre 2024 | `EWtwaJ0knOQ` | 16:9 |
+| sport | AU – Piacenza — 13 ottobre 2024 | `-2qaXyOJheM` | Short 9:16 |
+| sport | AU – CUS — 30 marzo | `j4ac9Vh25Q0` | Short 9:16 |
+| sport | AU – Lecco | `mAFzy_zPfL8` | Short 9:16 |
+| sport | CUS – AU — 8 dicembre 2024 | `BF8hiFUey-Y` | Short 9:16 |
+| sport | AU – Settimo Torinese | `19W51NMPBBY` | Short 9:16 |
+| sport | Education and Sport 2026 — Day 1 | `NkFm30vPViY` | Short 9:16 |
+| sport | Education and Sport 2026 — Day 2 | `NTZT6TC8wmw` | Short 9:16 |
+
+Ogni id è stato verificato con l'endpoint oEmbed di YouTube prima di inserirlo:
+tutti e 13 rispondono, sono pubblici e riportano `author_name` "Samuele
+Casabianca". Un id sbagliato avrebbe prodotto un riquadro nero sul sito.
 
 ### Come funziona
 
-Nuovo campo facoltativo **`youtube`** nelle voci di `VIDEO_DATA`. Di
-conseguenza `videoPlayerHtml()` in `js/main.js` ha ora tre rami, in
-quest'ordine: `youtube` → embed; altrimenti `src` → `<video>` locale;
-altrimenti segnaposto. Per aggiungere un video basta quindi una riga nel
-dataset, nessuna modifica a HTML o CSS.
+Campo **`youtube`** nelle voci di `VIDEO_DATA`. `videoPlayerHtml()` in
+`js/main.js` ha tre rami, in quest'ordine: `youtube` → embed; `src` → `<video>`
+locale; nessuno dei due → segnaposto. Il ramo `src` **non è più usato da
+nessuna voce** ma resta disponibile, se un domani servisse un video che non può
+stare su YouTube.
 
-L'embed usa il dominio **youtube-nocookie.com**, che non scrive cookie finché
-non si preme play, e `loading="lazy"`: aprendo la pagina non parte nessun
-download del video. In CSS è stata aggiunta `.watch-player--real iframe`
-accanto alla regola gemella per `video` (su un iframe `object-fit` non ha
-effetto: le eventuali fasce attorno al video le gestisce YouTube).
+L'embed usa **youtube-nocookie.com**, che non scrive cookie finché non si preme
+play, con `loading="lazy"`: aprendo la pagina non parte nessun download. In CSS
+`.watch-player--real iframe` sta accanto alla regola gemella per `video` (su un
+iframe `object-fit` non ha effetto, le fasce le gestisce YouTube).
 
-### Due dettagli non ovvi
+### Miniature: 10 locali, 3 da YouTube
 
-**La durata dello Short è assente, di proposito.** YouTube non espone la durata
-degli Short, e inventarla sarebbe stato peggio che ometterla. Il campo `durata`
-è quindi diventato facoltativo: il riquadro della galleria, i meta della pagina
-di riproduzione e i video correlati lo mostrano solo se c'è. Le durate di id 4 e
-id 5 restano quelle lette a suo tempo dai file locali, che sono gli stessi
-montaggi.
+I titoli su YouTube combaciano con i nomi dei file locali **date comprese**
+(`AU vs PIACENZA 13 10 2024` ↔ `au-piacenza-13-10-2024.mp4`, `CUS VS AU 08 12
+2024` ↔ `cus-vs-au-08-12-2024.mp4`, …): sono gli stessi montaggi, quindi dieci
+voci riusano i fotogrammi già estratti in `assets/video/poster/`, che sono
+locali, leggeri e passati dalla pipeline del progetto.
 
-**Il poster dello Short è l'unica immagine esterna del sito.** Per gli altri
-video la miniatura è un file in `assets/video/poster/`, estratto dal filmato;
-questo Short non è mai passato da `assets/video/`, quindi non esiste un
-fotogramma locale, e scaricare la miniatura da `i.ytimg.com` non è stato
-possibile. La voce punta perciò a
-`https://i.ytimg.com/vi/PhGkrl7YK8E/hqdefault.jpg`: è l'unica deroga alla regola
-"il sito referenzia solo `assets/`", e il video è comunque servito da YouTube.
-Quella miniatura è 4:3 con il contenuto verticale centrato, e il riquadro 9:16
-la ritaglia con `cover` eliminando le bande laterali. **Se arriva un fotogramma
-locale, sostituirlo**: basta passarlo per la solita pipeline (exif-transpose →
-1800px → JPEG q82) e cambiare il `poster`.
+Fanno eccezione **Samec Cremona**, **Samec x SRT Cuneo** e **Mura Festival —
+Lidia Cao**: non sono mai passati da `assets/video/`, quindi non esiste un
+fotogramma locale e `i.ytimg.com` non è raggiungibile da qui per scaricarlo. Le
+loro miniature puntano a `https://i.ytimg.com/vi/<id>/hqdefault.jpg` — le
+uniche immagini esterne del sito. Funzionano, e per il Short verticale la
+miniatura 4:3 con il contenuto centrato viene ritagliata a 9:16 con `cover`,
+che elimina le bande laterali. **Se arrivano i fotogrammi locali, sostituirli**
+passandoli per la solita pipeline (exif-transpose → 1800px → JPEG q82).
+
+### Durate: solo dove sono vere
+
+Le durate dei 10 video con corrispondenza locale vengono dai rispettivi file
+`.mp4`, lette a suo tempo dall'atomo `mvhd`. Per gli altri tre YouTube non
+espone la durata, e inventarla sarebbe stato peggio che ometterla: il campo
+`durata` è quindi **facoltativo**, e galleria, meta della pagina di
+riproduzione e video correlati lo mostrano solo quando c'è.
+
+### Cosa è sparito
+
+Non sono più sul sito i 9 video che non comparivano nella lista del cliente:
+Miu Miu, Video Evento 1 e 2, Videoriassunto IKEA, AU – Alghero, AU – Parma,
+Derby AU – CUS, e i Day da 3 a 7 di Education and Sport. I loro 12 fotogrammi
+di copertina sono stati tolti dal repository (spostati in
+`_to_delete/poster-non-usati/`, recuperabili comunque dalla storia di git). I
+file `.mp4` restano sul disco di sviluppo, ormai inutilizzati dal sito.
+
+Di conseguenza sono stati aggiornati anche i `data-images` dei pannelli di
+`video.html` e `lavoro.html`, che anteprimavano video non più presenti.
+
+### Un'ambiguità risolta
+
+I file `DAY 1.mp4` … `DAY 7.mp4`, su cui questo documento segnalava "sono 7
+giornate della stessa cosa, ma non si sa di quale evento", sono
+**Education and Sport 2026**: lo confermano i titoli su YouTube.
+
 
 ## Bugfix
 
@@ -1983,9 +2022,9 @@ nella riga social delle pagine a pannelli.
 
 1. Ricevere le foto mancanti (Brand, Gala, Calcio, Pallavolo) e inserirle con la
    stessa pipeline usata per le altre categorie (vedi "Immagini reali inserite").
-2. Pubblicare i restanti 20 video: la strada è già tracciata, bastano un
-   caricamento su YouTube e il campo `youtube` nel dataset (vedi "Primi video su
-   YouTube"), senza toccare altro. Streaming: ricevere i
+2. ~~Pubblicare i video~~ — fatto: tutti e 13 su YouTube. Per aggiungerne
+   altri basta una riga nel dataset con il campo `youtube`. Streaming resta
+   l'unica sezione senza contenuti. Streaming: ricevere i
    contenuti e sostituire `STREAM_DATA`.
 3. ~~Email e social reali~~ — fatto.
 4. Rifiniture su testi bio e descrizioni categorie (ora testi provvisori).

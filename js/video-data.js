@@ -16,10 +16,14 @@
      durata       'M:SS', letta dall'atomo mvhd del file MP4
      verticale    true se il file è girato in verticale (9:16): il player e la
                   miniatura si adattano invece di deformare l'immagine
-     youtube      id del video su YouTube: se presente il player usa l'embed
-                  invece del file locale, e il video funziona anche online
-     src          percorso del file video reale; se mancano sia `youtube` sia
-                  `src`, la pagina mostra il placeholder al posto del player
+     youtube      id del video su YouTube: il player usa l'embed. OGGI TUTTE LE
+                  VOCI USANO QUESTO CAMPO, quindi la sezione video funziona
+                  per intero anche sul sito pubblicato
+     durata       'M:SS'. Facoltativo: YouTube non espone la durata degli
+                  Short, e dove manca il riquadro semplicemente non la mostra
+     src          percorso di un file video locale, alternativa a `youtube`.
+                  Nessuna voce lo usa più, ma il player lo supporta ancora; se
+                  mancano sia `youtube` sia `src` si vede il placeholder
      poster       fotogramma di copertina; se manca, si vede il placeholder
      descrizione  testo sotto al player
 
@@ -47,33 +51,24 @@ const STREAM_DATA = [
 /* Video reali, da `immagini/PORTFOLIO/VIDEO/<CATEGORIA>/` (vedi PROGRESS.md):
    la categoria di ogni video viene dalla sottocartella in cui si trovava. */
 const VIDEO_DATA = [
-  { id: 1, titolo: 'Miu Miu — 7 giugno 2024', categoria: 'eventi', canale: 'Samuele Casabianca', durata: '0:47', verticale: true, src: 'assets/video/eventi/miu-miu-07-06-2024.mp4', poster: 'assets/video/poster/miu-miu-07-06-2024.jpg', descrizione: 'Video di evento realizzato da Samuele Casabianca.' },
-  { id: 2, titolo: 'Video Evento 1', categoria: 'eventi', canale: 'Samuele Casabianca', durata: '0:36', verticale: false, src: 'assets/video/eventi/video-evento-1.mp4', poster: 'assets/video/poster/video-evento-1.jpg', descrizione: 'Video di evento realizzato da Samuele Casabianca.' },
-  { id: 3, titolo: 'Video Evento 2', categoria: 'eventi', canale: 'Samuele Casabianca', durata: '0:35', verticale: false, src: 'assets/video/eventi/video-evento-2.mp4', poster: 'assets/video/poster/video-evento-2.jpg', descrizione: 'Video di evento realizzato da Samuele Casabianca.' },
-  { id: 4, titolo: 'Video Emozionale', categoria: 'eventi', canale: 'Samuele Casabianca', durata: '1:42', verticale: false, youtube: 'gMEN3C5hZ-M', poster: 'assets/video/poster/video-emozionale.jpg', descrizione: 'Video di evento realizzato da Samuele Casabianca.' },
-  { id: 5, titolo: 'Festa 50 Anni Miar', categoria: 'eventi', canale: 'Samuele Casabianca', durata: '2:04', verticale: false, youtube: '--_EgvYigjA', poster: 'assets/video/poster/festa-50-anni-miar.jpg', descrizione: 'Video di evento realizzato da Samuele Casabianca.' },
-  { id: 6, titolo: 'Videoriassunto Evento IKEA — 28 aprile 2026', categoria: 'eventi', canale: 'Samuele Casabianca', durata: '1:26', verticale: false, src: 'assets/video/eventi/videoriassunto-ikea-28-04-2026.mp4', poster: 'assets/video/poster/videoriassunto-ikea-28-04-2026.jpg', descrizione: 'Video di evento realizzato da Samuele Casabianca.' },
-  // Short verticale su YouTube: `durata` assente perche' YouTube non la espone
-  // per gli Short, e il riquadro la omette invece di mostrare un valore inventato.
-  // `poster` punta alla miniatura di YouTube: non esiste un file locale per
-  // questo video, che non e' mai passato da assets/video/.
-  { id: 23, titolo: 'Mura Festival — Lidia Cao', categoria: 'eventi', canale: 'Samuele Casabianca', verticale: true, youtube: 'PhGkrl7YK8E', poster: 'https://i.ytimg.com/vi/PhGkrl7YK8E/hqdefault.jpg', descrizione: 'Video di evento realizzato da Samuele Casabianca.' },
-  { id: 7, titolo: 'Matrimonio Claudia & Ivan — 14 settembre 2024', categoria: 'matrimoni', canale: 'Samuele Casabianca', durata: '4:58', verticale: false, src: 'assets/video/matrimoni/matrimonio-claudia-ivan-14-09-2024.mp4', poster: 'assets/video/poster/matrimonio-claudia-ivan-14-09-2024.jpg', descrizione: 'Video di matrimonio realizzato da Samuele Casabianca.' },
-  { id: 8, titolo: 'AU – Alghero', categoria: 'sport', canale: 'Samuele Casabianca', durata: '1:39', verticale: true, src: 'assets/video/sport/au-alghero.mp4', poster: 'assets/video/poster/au-alghero.jpg', descrizione: 'Video sportivo realizzato da Samuele Casabianca.' },
-  { id: 9, titolo: 'AU – CUS — 30 marzo', categoria: 'sport', canale: 'Samuele Casabianca', durata: '1:38', verticale: true, src: 'assets/video/sport/au-cus-30-marzo.mp4', poster: 'assets/video/poster/au-cus-30-marzo.jpg', descrizione: 'Video sportivo realizzato da Samuele Casabianca.' },
-  { id: 10, titolo: 'AU – Lecco', categoria: 'sport', canale: 'Samuele Casabianca', durata: '1:45', verticale: true, src: 'assets/video/sport/au-lecco.mp4', poster: 'assets/video/poster/au-lecco.jpg', descrizione: 'Video sportivo realizzato da Samuele Casabianca.' },
-  { id: 11, titolo: 'AU – Parma — 2 febbraio 2025', categoria: 'sport', canale: 'Samuele Casabianca', durata: '1:30', verticale: true, src: 'assets/video/sport/au-parma-02-02-2025.mp4', poster: 'assets/video/poster/au-parma-02-02-2025.jpg', descrizione: 'Video sportivo realizzato da Samuele Casabianca.' },
-  { id: 12, titolo: 'AU – Piacenza — 13 ottobre 2024', categoria: 'sport', canale: 'Samuele Casabianca', durata: '1:31', verticale: true, src: 'assets/video/sport/au-piacenza-13-10-2024.mp4', poster: 'assets/video/poster/au-piacenza-13-10-2024.jpg', descrizione: 'Video sportivo realizzato da Samuele Casabianca.' },
-  { id: 13, titolo: 'AU – Settimo Torinese', categoria: 'sport', canale: 'Samuele Casabianca', durata: '1:30', verticale: true, src: 'assets/video/sport/au-settimo-torinese.mp4', poster: 'assets/video/poster/au-settimo-torinese.jpg', descrizione: 'Video sportivo realizzato da Samuele Casabianca.' },
-  { id: 14, titolo: 'CUS vs AU — 8 dicembre 2024', categoria: 'sport', canale: 'Samuele Casabianca', durata: '1:31', verticale: true, src: 'assets/video/sport/cus-vs-au-08-12-2024.mp4', poster: 'assets/video/poster/cus-vs-au-08-12-2024.jpg', descrizione: 'Video sportivo realizzato da Samuele Casabianca.' },
-  { id: 15, titolo: 'Day 1', categoria: 'sport', canale: 'Samuele Casabianca', durata: '1:31', verticale: true, src: 'assets/video/sport/day-1.mp4', poster: 'assets/video/poster/day-1.jpg', descrizione: 'Video sportivo realizzato da Samuele Casabianca.' },
-  { id: 16, titolo: 'Day 2', categoria: 'sport', canale: 'Samuele Casabianca', durata: '1:28', verticale: true, src: 'assets/video/sport/day-2.mp4', poster: 'assets/video/poster/day-2.jpg', descrizione: 'Video sportivo realizzato da Samuele Casabianca.' },
-  { id: 17, titolo: 'Day 3', categoria: 'sport', canale: 'Samuele Casabianca', durata: '1:31', verticale: true, src: 'assets/video/sport/day-3.mp4', poster: 'assets/video/poster/day-3.jpg', descrizione: 'Video sportivo realizzato da Samuele Casabianca.' },
-  { id: 18, titolo: 'Day 4', categoria: 'sport', canale: 'Samuele Casabianca', durata: '0:45', verticale: true, src: 'assets/video/sport/day-4.mp4', poster: 'assets/video/poster/day-4.jpg', descrizione: 'Video sportivo realizzato da Samuele Casabianca.' },
-  { id: 19, titolo: 'Day 5', categoria: 'sport', canale: 'Samuele Casabianca', durata: '1:08', verticale: true, src: 'assets/video/sport/day-5.mp4', poster: 'assets/video/poster/day-5.jpg', descrizione: 'Video sportivo realizzato da Samuele Casabianca.' },
-  { id: 20, titolo: 'Day 6', categoria: 'sport', canale: 'Samuele Casabianca', durata: '0:56', verticale: true, src: 'assets/video/sport/day-6.mp4', poster: 'assets/video/poster/day-6.jpg', descrizione: 'Video sportivo realizzato da Samuele Casabianca.' },
-  { id: 21, titolo: 'Day 7', categoria: 'sport', canale: 'Samuele Casabianca', durata: '1:30', verticale: true, src: 'assets/video/sport/day-7.mp4', poster: 'assets/video/poster/day-7.jpg', descrizione: 'Video sportivo realizzato da Samuele Casabianca.' },
-  { id: 22, titolo: 'Derby AU – CUS', categoria: 'sport', canale: 'Samuele Casabianca', durata: '0:59', verticale: true, src: 'assets/video/sport/derby-au-cus.mp4', poster: 'assets/video/poster/derby-au-cus.jpg', descrizione: 'Video sportivo realizzato da Samuele Casabianca.' },
+  // ---- Eventi ----
+  { id: 1, titolo: 'Festa 50 Anni Miar', categoria: 'eventi', canale: 'Samuele Casabianca', durata: '2:04', verticale: false, youtube: '--_EgvYigjA', poster: 'assets/video/poster/festa-50-anni-miar.jpg', descrizione: 'Video di evento realizzato da Samuele Casabianca.' },
+  { id: 2, titolo: 'Video Emozionale — Miar', categoria: 'eventi', canale: 'Samuele Casabianca', durata: '1:42', verticale: false, youtube: 'gMEN3C5hZ-M', poster: 'assets/video/poster/video-emozionale.jpg', descrizione: 'Video di evento realizzato da Samuele Casabianca.' },
+  { id: 3, titolo: 'Samec Cremona', categoria: 'eventi', canale: 'Samuele Casabianca', verticale: false, youtube: 'K96zFyIWVV8', poster: 'https://i.ytimg.com/vi/K96zFyIWVV8/hqdefault.jpg', descrizione: 'Video di evento realizzato da Samuele Casabianca.' },
+  { id: 4, titolo: 'Samec x SRT Cuneo', categoria: 'eventi', canale: 'Samuele Casabianca', verticale: false, youtube: '4KUC6pT8ID0', poster: 'https://i.ytimg.com/vi/4KUC6pT8ID0/hqdefault.jpg', descrizione: 'Video di evento realizzato da Samuele Casabianca.' },
+  { id: 5, titolo: 'Mura Festival — Lidia Cao', categoria: 'eventi', canale: 'Samuele Casabianca', verticale: true, youtube: 'PhGkrl7YK8E', poster: 'https://i.ytimg.com/vi/PhGkrl7YK8E/hqdefault.jpg', descrizione: 'Video di evento realizzato da Samuele Casabianca.' },
+
+  // ---- Matrimoni ----
+  { id: 6, titolo: 'Matrimonio Claudia & Ivan — 14 settembre 2024', categoria: 'matrimoni', canale: 'Samuele Casabianca', durata: '4:58', verticale: false, youtube: 'EWtwaJ0knOQ', poster: 'assets/video/poster/matrimonio-claudia-ivan-14-09-2024.jpg', descrizione: 'Video di matrimonio realizzato da Samuele Casabianca.' },
+
+  // ---- Sport (tutti Short verticali) ----
+  { id: 7, titolo: 'AU – Piacenza — 13 ottobre 2024', categoria: 'sport', canale: 'Samuele Casabianca', durata: '1:31', verticale: true, youtube: '-2qaXyOJheM', poster: 'assets/video/poster/au-piacenza-13-10-2024.jpg', descrizione: 'Video sportivo realizzato da Samuele Casabianca.' },
+  { id: 8, titolo: 'AU – CUS — 30 marzo', categoria: 'sport', canale: 'Samuele Casabianca', durata: '1:38', verticale: true, youtube: 'j4ac9Vh25Q0', poster: 'assets/video/poster/au-cus-30-marzo.jpg', descrizione: 'Video sportivo realizzato da Samuele Casabianca.' },
+  { id: 9, titolo: 'AU – Lecco', categoria: 'sport', canale: 'Samuele Casabianca', durata: '1:45', verticale: true, youtube: 'mAFzy_zPfL8', poster: 'assets/video/poster/au-lecco.jpg', descrizione: 'Video sportivo realizzato da Samuele Casabianca.' },
+  { id: 10, titolo: 'CUS – AU — 8 dicembre 2024', categoria: 'sport', canale: 'Samuele Casabianca', durata: '1:31', verticale: true, youtube: 'BF8hiFUey-Y', poster: 'assets/video/poster/cus-vs-au-08-12-2024.jpg', descrizione: 'Video sportivo realizzato da Samuele Casabianca.' },
+  { id: 11, titolo: 'AU – Settimo Torinese', categoria: 'sport', canale: 'Samuele Casabianca', durata: '1:30', verticale: true, youtube: '19W51NMPBBY', poster: 'assets/video/poster/au-settimo-torinese.jpg', descrizione: 'Video sportivo realizzato da Samuele Casabianca.' },
+  { id: 12, titolo: 'Education and Sport 2026 — Day 1', categoria: 'sport', canale: 'Samuele Casabianca', durata: '1:31', verticale: true, youtube: 'NkFm30vPViY', poster: 'assets/video/poster/day-1.jpg', descrizione: 'Video sportivo realizzato da Samuele Casabianca.' },
+  { id: 13, titolo: 'Education and Sport 2026 — Day 2', categoria: 'sport', canale: 'Samuele Casabianca', durata: '1:28', verticale: true, youtube: 'NTZT6TC8wmw', poster: 'assets/video/poster/day-2.jpg', descrizione: 'Video sportivo realizzato da Samuele Casabianca.' },
 ];
 
 /* Categorie di VIDEO_DATA: nome mostrato e pagina galleria della categoria
